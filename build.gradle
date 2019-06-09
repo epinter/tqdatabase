@@ -1,0 +1,39 @@
+apply plugin: 'java-library'
+
+group 'br.com.pinter.tqdatabase'
+version '0.2'
+
+sourceCompatibility = 11
+targetCompatibility = 11
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+    compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.9'
+}
+
+ext.moduleName = 'br.com.pinter.tqdatabase'
+
+jar {
+    manifest {
+        inputs.property("moduleName", moduleName)
+        attributes('Implementation-Title': project.name,
+                'Implementation-Version': project.version,
+                'Automatic-Module-Name': moduleName)
+    }
+}
+
+compileJava {
+
+    inputs.property("moduleName", moduleName)
+    doFirst {
+        options.compilerArgs = [
+                '--module-path', classpath.asPath,
+        ]
+        classpath = files()
+    }
+}
+
