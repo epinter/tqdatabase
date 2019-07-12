@@ -4,8 +4,8 @@
 
 package br.com.pinter.tqdatabase;
 
-import br.com.pinter.tqdatabase.util.BOM;
 import br.com.pinter.tqdatabase.cache.CacheText;
+import br.com.pinter.tqdatabase.util.BOM;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -58,7 +58,7 @@ public class Text {
     /**
      * Method to preload all strings
      */
-    public void preload() {
+    public void preload() throws IOException {
         getString(null);
     }
 
@@ -69,7 +69,7 @@ public class Text {
      * @return returns the string associated to the <b><code>tag</code></b>
      */
     @SuppressWarnings({"SameParameterValue", "WeakerAccess"})
-    public String getString(String tag) {
+    public String getString(String tag) throws IOException {
         if ((useCache && CacheText.getInstance().isEmpty()) || (!useCache && tags.isEmpty())) {
             loadText();
         }
@@ -88,7 +88,7 @@ public class Text {
         }
     }
 
-    private void loadText() {
+    private void loadText() throws IOException {
         ArcFile arcFile;
         String filename;
         if (lang.matches("[A-Z]{2}")) {
@@ -96,12 +96,7 @@ public class Text {
         } else {
             filename = String.format("%s/Text_EN.arc", path);
         }
-        try {
-            arcFile = new ArcFile(filename);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return;
-        }
+        arcFile = new ArcFile(filename);
 
         for (String tf : arcFile.listRecords()) {
             byte[] d = arcFile.getData(tf);
@@ -126,8 +121,6 @@ public class Text {
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
                 return;
-            } catch (IOException e) {
-                e.printStackTrace();
             }
         }
     }
