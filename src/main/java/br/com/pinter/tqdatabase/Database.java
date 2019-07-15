@@ -15,6 +15,7 @@ import java.io.IOException;
 @SuppressWarnings({"WeakerAccess", "unused"})
 public class Database {
     private Skills skills;
+    private Player player;
     private String fileName;
     private ArzFile arzFile;
 
@@ -34,6 +35,7 @@ public class Database {
     public Database(String fileName, int debug) throws IOException {
         arzFile = new ArzFile(fileName, debug);
         skills = new Skills(arzFile);
+        player = new Player(arzFile);
     }
 
     /**
@@ -41,6 +43,7 @@ public class Database {
      */
     public void preloadAll() {
         skills.preload();
+        player.preload();
     }
 
     /**
@@ -81,6 +84,8 @@ public class Database {
         return skills;
     }
 
+    public Player player() { return player; }
+
     public static class Classes {
         public static final String SKILL_SPAWNPET = "Skill_SpawnPet";
         public static final String PET = "Pet";
@@ -105,5 +110,6 @@ public class Database {
         public static final String PREFIX_SKILL_NAME = "skillName";
         public static final String PREFIX_SKILL_LEVEL = "skillLevel";
         public static final String SKILL_NAME = "skillName";
+        public static final String LEVEL_FILE_NAME = "levelFileName";
     }
 }

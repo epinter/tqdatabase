@@ -14,7 +14,7 @@ import java.util.Map;
 /**
  * Class to work with Skills from game database
  */
-public class Skills {
+public class Skills implements ITQService {
     private SkillDAO skillDAO;
 
     /**

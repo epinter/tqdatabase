@@ -26,14 +26,14 @@ public class TextTest {
     }
 
     @Test
-    public void getString_Given_Tag_Then_returnText() {
+    public void getString_Given_Tag_Then_returnText() throws IOException {
         assertNotNull(text.getString("tagGreeceQ1UiTitle"));
         assertNotEquals(text.getString("tagGreeceQ1UiTitle"), "tagGreeceQ1UiTitle");
         CacheText.getInstance().clear();
     }
 
     @Test
-    public void loadText_Should_loadAllStringsAndReturnNull() {
+    public void loadText_Should_loadAllStringsAndReturnNull() throws IOException {
         assertNull(text.getString(null));
         assertTrue(CacheText.getInstance().size() > 2);
     }
