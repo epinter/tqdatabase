@@ -5,6 +5,7 @@
 package br.com.pinter.tqdatabase;
 
 import br.com.pinter.tqdatabase.models.DbRecord;
+import br.com.pinter.tqdatabase.util.Util;
 
 import java.io.IOException;
 
@@ -85,6 +86,10 @@ public class Database {
     }
 
     public Player player() { return player; }
+
+    public static String normalizeRecordPath(String recordId) {
+        return Util.normalizeRecordPath(recordId);
+    }
 
     public static class Classes {
         public static final String SKILL_SPAWNPET = "Skill_SpawnPet";
