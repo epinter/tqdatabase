@@ -4,10 +4,10 @@
 
 package br.com.pinter.tqdatabase;
 
-import br.com.pinter.tqdatabase.util.Util;
 import br.com.pinter.tqdatabase.cache.CacheDbRecord;
 import br.com.pinter.tqdatabase.models.DbRecord;
 import br.com.pinter.tqdatabase.models.DbVariable;
+import br.com.pinter.tqdatabase.util.Util;
 
 import java.io.*;
 import java.nio.ByteBuffer;
@@ -19,23 +19,18 @@ import java.util.zip.InflaterInputStream;
 
 class ArzFile {
     private final ByteBuffer arzBuffer;
-    private int DBG;
     private String[] stringsTable;
     private Hashtable<String, DbRecord> recordsMetadata;
     private boolean useCache;
+    private final System.Logger logger = Util.getLogger(ArzFile.class.getName());
 
     @SuppressWarnings("WeakerAccess")
     public ArzFile(String fileName) throws IOException {
-        this(fileName, 0, true);
+        this(fileName, true);
     }
 
     @SuppressWarnings("WeakerAccess")
-    public ArzFile(String fileName, int debug) throws IOException {
-        this(fileName, debug, true);
-    }
-
-    @SuppressWarnings("WeakerAccess")
-    public ArzFile(String fileName, int debug, boolean useCache) throws IOException {
+    public ArzFile(String fileName, boolean useCache) throws IOException {
         // ARZ header file format
         // 0x000000 int32
         // 0x000004 int32 start of dbRecord table
@@ -44,7 +39,6 @@ class ArzFile {
         // 0x000010 int32 start of string table
         // 0x000014 int32 size in bytes of string table
 
-        DBG = debug;
         this.useCache = useCache;
 
         File file = new File(fileName);
@@ -53,14 +47,13 @@ class ArzFile {
         in.read(arzBuffer);
         arzBuffer.rewind();
 
-        if (DBG > 0)
-            System.err.printf("Loaded arz file (%s), %s bytes.\n", file.getName(), arzBuffer.capacity());
+        logger.log(System.Logger.Level.DEBUG, "Loaded arz file (''{0}''), ''{1}'' bytes.", file.getName(), arzBuffer.capacity());
 
         int[] header = new int[6];
 
         for (int i = 0; i < 6; i++) {
             header[i] = arzBuffer.getInt();
-            if (DBG > 0) System.err.printf("Header[%d] = %d 0x%X\n", i, header[i], header[i]);
+            logger.log(System.Logger.Level.TRACE, "Header[''{0}''] = ''{1}'' ''{2}''", i, header[i], String.format("%X", header[i]));
         }
 
         int recordsTableStart = header[1];
@@ -107,24 +100,23 @@ class ArzFile {
         int numStrings = arzBuffer.getInt();
         stringsTable = new String[numStrings];
 
-        if (DBG > 0) System.err.printf("string table at 0x%X numstrings=%s\n", start, numStrings);
+        logger.log(System.Logger.Level.DEBUG, "string table at ''{0}'' numstrings=''{1}''\n", String.format("%X", start), numStrings);
 
         for (int i = 0; i < numStrings; i++) {
             stringsTable[i] = readString();
-            if (DBG > 1) System.err.printf("readStringsTable: %d %s\n", i, stringsTable[i]);
+            logger.log(System.Logger.Level.TRACE, "readStringsTable: ''{0}'' ''{1}''\n", i, stringsTable[i]);
         }
     }
 
     // loads all records metadata
     private void readRecordsTable(int start, int count) {
         recordsMetadata = new Hashtable<>();
-        if (DBG > 0) System.err.printf("recordsMetadata table at 0x%X numrecords=%s\n", start, count);
+        logger.log(System.Logger.Level.DEBUG, "recordsMetadata table at ''{0}'' numrecords=''{1}''\n", String.format("%X", start), count);
         arzBuffer.position(start);
         for (int i = 0; i < count; i++) {
             String recordId = recordMetadataGet();
             DbRecord r = recordsMetadata.get(recordId);
-            if (DBG > 1)
-                System.err.printf("readRecordsTable: %s %s %s %s\n", r.getStringIndex(), stringsTable[r.getStringIndex()], r.getOffset(), recordId);
+            logger.log(System.Logger.Level.TRACE, "readRecordsTable: ''{0}'' ''{1}'' ''{2}'' ''{3}''\n", r.getStringIndex(), stringsTable[r.getStringIndex()], r.getOffset(), recordId);
         }
     }
 
@@ -159,8 +151,7 @@ class ArzFile {
         //skips compressed size(32bit int) and 2 timestamps (32bit int each)
         arzBuffer.position(arzBuffer.position() + 12);
 
-        if (DBG > 1)
-            System.err.printf("recordMetadataGet: %s %s %s\n", idStringIndex, recordType, offset);
+        logger.log(System.Logger.Level.TRACE, "recordMetadataGet: ''{0}'' ''{1}'' ''{2}''\n", idStringIndex, recordType, offset);
 
         DbRecord r = new DbRecord();
         r.setId(Util.normalizeRecordPath(stringsTable[idStringIndex]));
@@ -206,8 +197,7 @@ class ArzFile {
             short valCount = buffer.getShort();
             int variableId = buffer.getInt();
             String variableName = stringsTable[variableId];
-            if (DBG > 1)
-                System.err.printf("recordDecode: %s %s %s %s\n", variableName, dataType, valCount, variableId);
+            logger.log(System.Logger.Level.TRACE, "recordDecode: ''{0}'' ''{1}'' ''{2}'' ''{3}''\n", variableName, dataType, valCount, variableId);
 
             if (dataType < 0 || dataType > 4 || variableName == null || variableName.isEmpty() || valCount < 0) {
                 throw new RuntimeException("Error parsing record " + id);
@@ -255,8 +245,7 @@ class ArzFile {
     private byte[] recordDecompress(String id) {
         DbRecord r = recordsMetadata.get(id);
         arzBuffer.position(r.getOffset() + 2);
-        if (DBG > 1)
-            System.err.printf("reading (%s) from offset %X type %s (pos %X)\n", id, r.getOffset(), r.getRecordType(), arzBuffer.position());
+        logger.log(System.Logger.Level.TRACE, "reading (''{0}'') from offset ''{1}'' type ''{2}'' (pos ''{3}'')\n", id, String.format("%X", r.getOffset()), r.getRecordType(), String.format("%X", arzBuffer.position()));
 
         ByteArrayOutputStream buffer = new ByteArrayOutputStream();
         ByteArrayInputStream input = new ByteArrayInputStream(arzBuffer.array(), arzBuffer.position(), arzBuffer.limit());
@@ -267,8 +256,7 @@ class ArzFile {
             for (int b; (b = inflaterInputStream.read()) != -1; ) {
                 buffer.write(b);
             }
-            if (DBG > 1)
-                System.err.println("buffer size " + buffer.size());
+            logger.log(System.Logger.Level.TRACE, "buffer size ", buffer.size());
         } catch (IOException e) {
             e.printStackTrace();
         }

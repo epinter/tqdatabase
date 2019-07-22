@@ -14,8 +14,6 @@ import java.util.List;
 
 @SuppressWarnings("WeakerAccess")
 interface BaseDAO {
-    boolean DBG = false;
-
     DbRecord getRecord(String recordPath);
 
     default BaseType getSpawnObject(DbRecord rs) {

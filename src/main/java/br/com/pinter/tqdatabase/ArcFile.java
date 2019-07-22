@@ -4,6 +4,8 @@
 
 package br.com.pinter.tqdatabase;
 
+import br.com.pinter.tqdatabase.util.Util;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -18,16 +20,10 @@ import java.util.zip.Inflater;
 
 class ArcFile {
     private final ByteBuffer arcBuffer;
-    @SuppressWarnings("UnusedAssignment")
-    private int DBG = 0;
     private Hashtable<String, ArcEntry> records;
+    private final System.Logger logger = Util.getLogger(ArcFile.class.getName());
 
-    public ArcFile(String fileName) throws IOException {
-        this(fileName, 0);
-    }
-
-    @SuppressWarnings("UnusedAssignment")
-    private ArcFile(String fileName, int debug) throws IOException {
+    ArcFile(String fileName) throws IOException {
         // Format of an ARC file
         // 0x08 - 4 bytes = // of files
         // 0x0C - 4 bytes = // of parts
@@ -54,7 +50,6 @@ class ArcFile {
         // 4-byte int = length of filename string
         // 4-byte int = offset in directory structure for filename
 
-        DBG = debug;
         File file = new File(fileName);
         arcBuffer = ByteBuffer.allocate((Math.toIntExact(file.length()))).order(ByteOrder.LITTLE_ENDIAN);
         FileChannel in = new FileInputStream(file).getChannel();
@@ -83,8 +78,7 @@ class ArcFile {
 
         arcBuffer.position(tocOffset);
 
-        if (DBG > 0)
-            System.err.printf("numEntries:%d numPars:%d tocOffset:%d\n", numEntries, numParts, tocOffset);
+        logger.log(System.Logger.Level.TRACE, "numEntries:''{0}'' numPars:''{1}'' tocOffset:''{2}''", numEntries, numParts, tocOffset);
 
         Hashtable<Integer, ArcPart> parts = new Hashtable<>();
         Hashtable<Integer, ArcEntry> entries = new Hashtable<>();
@@ -98,8 +92,7 @@ class ArcFile {
             parts.put(i, part);
         }
 
-        if (DBG > 0)
-            System.err.printf("parts hashtable:%s\n", parts.size());
+        logger.log(System.Logger.Level.TRACE, "parts hashtable:''{0}''", parts.size());
 
 
         //filenames
@@ -136,8 +129,7 @@ class ArcFile {
             }
             entries.put(i, entry);
         }
-        if (DBG > 0)
-            System.err.printf("entries hashtable:%s\n", entries.size());
+        logger.log(System.Logger.Level.TRACE, "entries hashtable:''{0}''", entries.size());
 
         //record names
         arcBuffer.position(filenamesOffset);
@@ -164,8 +156,8 @@ class ArcFile {
                 }
             }
         }
-        if (DBG > 0)
-            System.err.printf("records hashtable:%s\n", records.size());
+
+        logger.log(System.Logger.Level.TRACE, "records hashtable:''{0}''", records.size());
 
     }
 
@@ -198,9 +190,8 @@ class ArcFile {
             int pos = 0;
             for (ArcPart p : e.getParts()) {
                 byte[] bufPart = decompressPart(p);
-                if (DBG > 0)
-                    System.err.printf("reading... bufsz:%d pos:%d partcsz:%d\n"
-                            , data.length, pos, p.getRealSize());
+                logger.log(System.Logger.Level.TRACE, "reading... bufsz:''{0}'' pos:''{1}'' partcsz:''{2}''",
+                        data.length, pos, p.getRealSize());
                 System.arraycopy(bufPart, 0, data, pos, bufPart.length);
                 pos += bufPart.length;
             }
@@ -210,9 +201,8 @@ class ArcFile {
     }
 
     private byte[] decompressPart(ArcPart part) {
-        if (DBG > 1)
-            System.err.printf("reading %d bytes part from offset %X\n",
-                    part.getCompressedSize(), part.getFileOffset());
+        logger.log(System.Logger.Level.TRACE, "reading ''{0}'' bytes part from offset ''{1}''",
+                part.getCompressedSize(), part.getFileOffset());
 
         byte[] buffer = new byte[part.getRealSize()];
         Inflater inflater = new Inflater(true);
@@ -222,8 +212,7 @@ class ArcFile {
             inflater.inflate(buffer);
             inflater.end();
 
-            if (DBG > 1)
-                System.err.println("buffer size " + buffer.length);
+            logger.log(System.Logger.Level.TRACE, "buffer size ''{0}''", buffer.length);
         } catch (DataFormatException e) {
             e.printStackTrace();
         }

@@ -17,6 +17,7 @@ import java.util.List;
 public class PcDAO implements BaseDAO {
     private ArzFile arzFile;
     private Pc pc;
+    private final System.Logger logger = Util.getLogger(PcDAO.class.getName());
 
     @Override
     public DbRecord getRecord(String recordPath) {
@@ -67,6 +68,7 @@ public class PcDAO implements BaseDAO {
                 throw new RuntimeException("illegal value reading database (pc)");
             }
         }
+        logger.log(System.Logger.Level.DEBUG, "pc: found ''{0}''", p);
         return p;
     }
 }

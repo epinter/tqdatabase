@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 class SkillDAO implements BaseDAO {
     private Map<String, Skill> skillList;
     private ArzFile arzFile;
+    private final System.Logger logger = Util.getLogger(SkillDAO.class.getName());
 
     SkillDAO(ArzFile arzFile) {
         this.arzFile = arzFile;
@@ -49,12 +50,9 @@ class SkillDAO implements BaseDAO {
     }
 
     public Skill getSkill(String recordPath, boolean resolve) {
-        Map<String, Skill> skillList = getSkillList();
-
         Instant i = Instant.now();
-        if (DBG) {
-            System.err.println("Skill List generation took " + Duration.between(i, Instant.now()));
-        }
+        Map<String, Skill> skillList = getSkillList();
+        logger.log(System.Logger.Level.TRACE, "Skill List generation took " + Duration.between(i, Instant.now()));
         Skill skill = skillList.get(Util.normalizeRecordPath(recordPath));
 
         if (skill == null) {
@@ -158,6 +156,8 @@ class SkillDAO implements BaseDAO {
                 skillList.put(s.getRecordPath(), s);
             }
         });
+        logger.log(System.Logger.Level.DEBUG, "skillList: found ''{0}''", skillList.values().size());
+        logger.log(System.Logger.Level.TRACE, "skillList: ''{0}''", skillList.keySet());
         this.skillList = skillList;
         return skillList;
     }
@@ -212,6 +212,7 @@ class SkillDAO implements BaseDAO {
         if (skillMasteryLevelRequired != null && skillMasteryLevelRequired.getValues() != null) {
             s.setSkillMasteryLevelRequired((Integer) skillMasteryLevelRequired.getValues().get(0));
         }
+        logger.log(System.Logger.Level.TRACE, "skillFromRecord: found ''{0}'': ''{1}''", s.getRecordPath(), s);
         return s;
     }
 
@@ -233,6 +234,9 @@ class SkillDAO implements BaseDAO {
                 }
             }
         }
+
+        logger.log(System.Logger.Level.DEBUG, "skillTreeRecords: found ''{0}''", skills.values().size());
+        logger.log(System.Logger.Level.TRACE, "skillTreeRecords: ''{0}''", skills.keySet());
 
         return new ArrayList<>(skills.values());
     }

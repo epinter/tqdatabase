@@ -5,6 +5,7 @@
 package br.com.pinter.tqdatabase;
 
 import br.com.pinter.tqdatabase.models.DbRecord;
+import br.com.pinter.tqdatabase.util.Constants;
 import br.com.pinter.tqdatabase.util.Util;
 
 import java.io.IOException;
@@ -25,16 +26,7 @@ public class Database {
      * @throws IOException if the file can't be read or parsed.
      */
     public Database(String fileName) throws IOException {
-        this(fileName, 0);
-    }
-
-    /**
-     * @param fileName The absolute path of the database.arz file.
-     * @param debug    Use to view debugging messages during database parse. Levels 1 and 2 are supported.
-     * @throws IOException if the file can't be read or parsed.
-     */
-    public Database(String fileName, int debug) throws IOException {
-        arzFile = new ArzFile(fileName, debug);
+        arzFile = new ArzFile(fileName);
         skills = new Skills(arzFile);
         player = new Player(arzFile);
     }

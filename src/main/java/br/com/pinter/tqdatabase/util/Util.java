@@ -11,6 +11,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class Util {
+    public static System.Logger getLogger(String name) {
+        return System.getLogger(name);
+    }
 
     public static List<DbVariable> filterRecordVariables(DbRecord r, String regexp) {
         if (r == null) {

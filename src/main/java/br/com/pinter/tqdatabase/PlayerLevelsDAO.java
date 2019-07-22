@@ -16,6 +16,7 @@ import java.util.List;
 public class PlayerLevelsDAO implements BaseDAO {
     private ArzFile arzFile;
     private PlayerLevels playerLevels;
+    private final System.Logger logger = Util.getLogger(PlayerLevelsDAO.class.getName());
 
     @Override
     public DbRecord getRecord(String recordPath) {
@@ -68,7 +69,9 @@ public class PlayerLevelsDAO implements BaseDAO {
         if (dbVariables != null && dbVariables.size() > 0) {
             DbVariable v = dbVariables.get(0);
             if (v.getType() == DbVariable.Type.String && v.getValues().size() == 1) {
-                return getRecord((String) dbVariables.get(0).getFirstValue());
+                DbRecord record = getRecord((String) dbVariables.get(0).getFirstValue());
+                logger.log(System.Logger.Level.DEBUG, "playerLevels: found ''{0}''", record);
+                return record;
             }
         }
         return null;
