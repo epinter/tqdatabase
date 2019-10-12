@@ -85,15 +85,24 @@ class SkillDAO implements BaseDAO {
 
         skillTreeRecords.forEach(f -> {
             DbRecord r = getRecord(f.getId());
+            if (r == null) {
+                throw new RuntimeException("Error parsing record " + f.getId());
+            }
+
             List<DbVariable> skillNameVars = Util.filterRecordVariables(getRecord(r.getId()), Constants.REGEXP_FIELD_SKILLNAME);
             Hashtable<String, DbVariable> skillLevelVars = getVarTable(r, Database.Variables.PREFIX_SKILL_LEVEL);
 
-
             if (skillNameVars == null) {
-                throw new RuntimeException("Skill records not found, regexp failed: " + Constants.REGEXP_FIELD_SKILLNAME);
+                throw new RuntimeException("Skill records not found, regexp failed: " + Constants.REGEXP_FIELD_SKILLNAME
+                        + " for record " + f.getId());
+            }
+
+            if (skillLevelVars == null) {
+                throw new RuntimeException("Skill level variables not parsed for record " + f.getId());
             }
 
             List<Skill> masterySkillList = new ArrayList<>();
+
             Skill currentMastery = null;
             for (DbVariable v : skillNameVars) {
                 String strIdx = v.getVariableName().replaceAll("[a-zA-Z]+(\\d+)$", "$1");
