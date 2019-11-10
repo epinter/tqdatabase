@@ -22,7 +22,7 @@ class SkillDAO implements BaseDAO {
     SkillDAO(ArzFile arzFile) {
         this.arzFile = arzFile;
     }
-    
+
     @Override
     public DbRecord getRecord(String recordPath) {
         return arzFile.getRecord(recordPath);
@@ -113,7 +113,7 @@ class SkillDAO implements BaseDAO {
                     continue;
                 }
 
-                if (v.getType() == DbVariable.Type.String && v.getValues().size() == 1) {
+                if (v.getType() == DbVariable.Type.String && v.getValues() != null && v.getValues().size() == 1) {
                     DbRecord rs = getRecord((String) v.getValues().get(0));
                     DbVariable varClass = rs.getVariables().get(Database.Variables.CLASS);
 
