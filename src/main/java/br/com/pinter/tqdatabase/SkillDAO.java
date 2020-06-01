@@ -121,7 +121,13 @@ class SkillDAO implements BaseDAO {
                 }
 
                 if (v.getType() == DbVariable.Type.String && v.getValues() != null && v.getValues().size() == 1) {
-                    DbRecord rs = getRecord((String) v.getValues().get(0));
+                    String skillPath = (String) v.getValues().get(0);
+                    DbRecord rs = getRecord(skillPath);
+                    if (rs == null) {
+                        logger.log(System.Logger.Level.ERROR, "Skill not found (from skilltree): %s/%s",
+                                skillPath, f.getId());
+                        continue;
+                    }
                     DbVariable varClass = rs.getVariables().get(Database.Variables.CLASS);
 
                     if (varClass != null && varClass.getType() == DbVariable.Type.String && varClass.getValues().size() == 1) {
@@ -239,7 +245,10 @@ class SkillDAO implements BaseDAO {
                 String p = (String) v.getValues().get(0);
                 if (p != null && !p.isEmpty() && !skills.containsKey(p) && p.matches(Constants.REGEXP_PATH_SKILLTREE)) {
                     String recordPath = Util.normalizeRecordPath(p);
-                    skills.put(recordPath, getRecord(recordPath));
+                    DbRecord record = getRecord(recordPath);
+                    if (record != null) {
+                        skills.put(recordPath, record);
+                    }
                 }
             }
         }
