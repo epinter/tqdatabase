@@ -38,6 +38,9 @@ public class PlayerLevelsDAO implements BaseDAO {
         }
 
         DbRecord r = getPlayerLevelRecord();
+        if(r == null) {
+            throw new RuntimeException("playerlevels record not found in database");
+        }
         Hashtable<String, DbVariable> variables = r.getVariables();
         PlayerLevels p = new PlayerLevels();
         p.setSkillModifierPoints((Integer) variables.get("skillModifierPoints").getFirstValue());
@@ -68,7 +71,7 @@ public class PlayerLevelsDAO implements BaseDAO {
 
         if (dbVariables != null && dbVariables.size() > 0) {
             DbVariable v = dbVariables.get(0);
-            if (v.getType() == DbVariable.Type.String && v.getValues().size() == 1) {
+            if (v != null && v.getType() == DbVariable.Type.String && v.getValues().size() == 1) {
                 DbRecord record = getRecord((String) dbVariables.get(0).getFirstValue());
                 logger.log(System.Logger.Level.DEBUG, "playerLevels: found ''{0}''", record);
                 return record;

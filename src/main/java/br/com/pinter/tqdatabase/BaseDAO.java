@@ -17,6 +17,9 @@ interface BaseDAO {
     DbRecord getRecord(String recordPath);
 
     default BaseType getSpawnObject(DbRecord rs) {
+        if(rs == null) {
+            return null;
+        }
         String className = (String) rs.getFirstValue(Database.Variables.CLASS);
         String characterRacialProfile = (String) rs.getFirstValue(Database.Variables.CHARACTER_RACIAL_PROFILE);
         String actorName = (String) rs.getFirstValue(Database.Variables.ACTOR_NAME);

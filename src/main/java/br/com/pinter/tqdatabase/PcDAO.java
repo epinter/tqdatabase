@@ -39,6 +39,9 @@ public class PcDAO implements BaseDAO {
         }
         Pc p = new Pc();
         DbRecord r = getRecord(Constants.RECORD_PC);
+        if(r == null) {
+            throw new RuntimeException("player character record not found in database)");
+        }
         List<DbVariable> skillTreeVars = Util.filterRecordVariables(r, Constants.REGEXP_FIELD_SKILLTREE);
         Hashtable<String, DbVariable> dbVariables = r.getVariables();
 
