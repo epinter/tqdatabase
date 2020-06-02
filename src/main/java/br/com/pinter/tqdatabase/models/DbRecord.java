@@ -6,6 +6,7 @@ package br.com.pinter.tqdatabase.models;
 
 import br.com.pinter.tqdatabase.Database;
 
+import java.util.Collections;
 import java.util.Hashtable;
 import java.util.List;
 
@@ -68,14 +69,14 @@ public class DbRecord {
         if (variables.get(variable) != null) {
             return variables.get(variable).getListString();
         }
-        return null;
+        return Collections.emptyList();
     }
 
     public List<Integer> getListInteger(String variable) {
         if (variables.get(variable) != null) {
             return variables.get(variable).getListInteger();
         }
-        return null;
+        return Collections.emptyList();
     }
 
     public String getRecordClass() {

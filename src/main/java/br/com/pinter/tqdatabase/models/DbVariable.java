@@ -4,10 +4,7 @@
 
 package br.com.pinter.tqdatabase.models;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 public class DbVariable {
     private String variableName;
@@ -48,7 +45,7 @@ public class DbVariable {
             values.forEach(f -> list.add((String) f));
             return list;
         }
-        return null;
+        return Collections.emptyList();
     }
 
     public List<Integer> getListInteger() {
@@ -57,7 +54,7 @@ public class DbVariable {
             values.forEach(f -> list.add((Integer) f));
             return list;
         }
-        return null;
+        return Collections.emptyList();
     }
 
     @Override
