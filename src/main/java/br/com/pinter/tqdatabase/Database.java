@@ -18,6 +18,7 @@ import java.io.IOException;
 public class Database {
     private Skills skills;
     private Player player;
+    private Teleports teleports;
     private String fileName;
     private ArzFile arzFile;
 
@@ -29,6 +30,7 @@ public class Database {
         arzFile = new ArzFile(fileName);
         skills = new Skills(arzFile);
         player = new Player(arzFile);
+        teleports = new Teleports(arzFile);
     }
 
     /**
@@ -37,6 +39,7 @@ public class Database {
     public void preloadAll() {
         skills.preload();
         player.preload();
+        teleports.preload();
     }
 
     /**
@@ -78,6 +81,8 @@ public class Database {
     }
 
     public Player player() { return player; }
+
+    public Teleports teleports() { return teleports; }
 
     public static String normalizeRecordPath(String recordId) {
         return Util.normalizeRecordPath(recordId);
