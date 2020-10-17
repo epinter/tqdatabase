@@ -75,7 +75,7 @@ public class Text {
      */
     @SuppressWarnings({"SameParameterValue", "WeakerAccess"})
     public String getString(String tag) throws IOException {
-        loadTextFromAllPaths();
+        preload();
 
         if (tag == null) {
             return null;
