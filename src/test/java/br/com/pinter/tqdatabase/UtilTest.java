@@ -25,7 +25,7 @@ public class UtilTest {
             throw new IOException("File src/test/resources/database.arz is missing," +
                     " copy the database to execute the tests");
         }
-        database = new Database("src/test/resources/database.arz");
+        database = new Database(new String[]{"src/test/resources/database.arz"});
     }
 
     @Test

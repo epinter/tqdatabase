@@ -26,7 +26,7 @@ public class SkillDAOTest {
             throw new IOException("File src/test/resources/database.arz is missing," +
                     " copy the database to execute the tests");
         }
-        Database database = new Database("src/test/resources/database.arz");
+        Database database = new Database(new String[]{"src/test/resources/database.arz"});
         skills = database.skills();
     }
 

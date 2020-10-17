@@ -21,8 +21,9 @@ class ArzFile {
     private final ByteBuffer arzBuffer;
     private String[] stringsTable;
     private Hashtable<String, DbRecord> recordsMetadata;
-    private boolean useCache;
+    private final boolean useCache;
     private final System.Logger logger = Util.getLogger(ArzFile.class.getName());
+    private final String fileName;
 
     @SuppressWarnings("WeakerAccess")
     public ArzFile(String fileName) throws IOException {
@@ -31,6 +32,9 @@ class ArzFile {
 
     @SuppressWarnings("WeakerAccess")
     public ArzFile(String fileName, boolean useCache) throws IOException {
+        this.useCache = useCache;
+        this.fileName = fileName;
+
         // ARZ header file format
         // 0x000000 int32
         // 0x000004 int32 start of dbRecord table
@@ -38,8 +42,6 @@ class ArzFile {
         // 0x00000c int32 numEntries in dbRecord table
         // 0x000010 int32 start of string table
         // 0x000014 int32 size in bytes of string table
-
-        this.useCache = useCache;
 
         File file = new File(fileName);
         arzBuffer = ByteBuffer.allocate((Math.toIntExact(file.length()))).order(ByteOrder.LITTLE_ENDIAN);
@@ -63,6 +65,11 @@ class ArzFile {
         readStringsTable(stringsTableStart);
         readRecordsTable(recordsTableStart, recordsTableCount);
         in.close();
+    }
+
+    @Override
+    public String toString() {
+        return fileName;
     }
 
     @SuppressWarnings({"unused", "WeakerAccess"})

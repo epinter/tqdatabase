@@ -7,12 +7,20 @@ package br.com.pinter.tqdatabase;
 import br.com.pinter.tqdatabase.models.DbRecord;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DatabaseReader {
-    private final ArzFile arzFile;
+    private final List<ArzFile> arzFiles;
 
-    public DatabaseReader(String fileName) throws IOException {
-        this.arzFile = new ArzFile(fileName);
+    public DatabaseReader(String[] fileNames) throws IOException {
+        List<ArzFile> arzFiles = new ArrayList<>();
+        for (String f : fileNames) {
+            if (f != null)
+                arzFiles.add(new ArzFile(f));
+        }
+
+        this.arzFiles = arzFiles;
     }
 
     /**
@@ -22,7 +30,13 @@ public class DatabaseReader {
      * @return A {@link DbRecord} instance
      */
     public DbRecord getRecord(String recordPath) {
-        return arzFile.getRecord(recordPath);
+        DbRecord record = null;
+        for (ArzFile arzFile : arzFiles) {
+            if (arzFile.exists(recordPath)) {
+                record = arzFile.getRecord(recordPath);
+            }
+        }
+        return record;
     }
 
     /**
@@ -31,7 +45,9 @@ public class DatabaseReader {
      * @param recordId The record-path to remove from cache
      */
     public void invalidateCacheEntry(String recordId) {
-        arzFile.invalidateCacheEntry(recordId);
+        for (ArzFile arzFile : arzFiles) {
+            arzFile.invalidateCacheEntry(recordId);
+        }
     }
 
     /**
@@ -41,6 +57,11 @@ public class DatabaseReader {
      * @return <b><code>true</code></b> if exists, <b><code>false</code></b> if not
      */
     public boolean recordExists(String recordId) {
-        return arzFile.exists(recordId);
+        for (ArzFile arzFile : arzFiles) {
+            if (arzFile.exists(recordId)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

@@ -23,11 +23,12 @@ public class Database {
     private final DatabaseReader databaseReader;
 
     /**
-     * @param fileName The absolute path of the database.arz file.
+     * @param fileNames An array with the absolute path of database.arz files to be loaded. The databases will be loaded using
+     *                  the order specified, and the records will be overriden by the database loaded last.
      * @throws IOException if the file can't be read or parsed.
      */
-    public Database(String fileName) throws IOException {
-        databaseReader = new DatabaseReader(fileName);
+    public Database(String[] fileNames) throws IOException {
+        databaseReader = new DatabaseReader(fileNames);
         skills = new Skills(databaseReader);
         player = new Player(databaseReader);
         teleports = new Teleports(databaseReader);
