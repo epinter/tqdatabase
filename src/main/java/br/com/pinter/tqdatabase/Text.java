@@ -7,11 +7,10 @@ package br.com.pinter.tqdatabase;
 import br.com.pinter.tqdatabase.cache.CacheText;
 import br.com.pinter.tqdatabase.util.BOM;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.StringReader;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
+import java.util.Arrays;
 import java.util.Hashtable;
+import java.util.List;
 
 /**
  * Class to access Text resources from game
@@ -20,46 +19,52 @@ import java.util.Hashtable;
 public class Text {
     private final Hashtable<String, String> tags;
     private final String lang;
-    private final String path;
+    private final List<String> pathList;
     private final boolean useCache;
 
     /**
      * Constructor for english (EN) text resources.
      *
-      * @param path Absolute path for the Text directory containing all Text_* files.
+      * @param paths Array of ordered absolute paths for the Text directories containing all Text_* files.
+     *              Strings from files loaded last will override those loaded first.
      */
-    public Text(String path) {
-        this(path, "EN", true);
+    public Text(String[] paths) {
+        this(paths, "EN", true);
     }
 
 
     /**
      * Constructor for text resources from specific language
      *
-     * @param path Absolute path for the Text directory containing all Text_* files.
+     * @param paths Array of ordered absolute paths for the Text directories containing all Text_* files.
+     *              Strings from files loaded last will override those loaded first.
      * @param lang The language to load text resources
      */
-    public Text(String path, String lang) {
-        this(path, lang, true);
+    public Text(String[] paths, String lang) {
+        this(paths, lang, true);
     }
 
     /**
-     * @param path Absolute path for the Text directory containing all Text_* files.
+     * @param paths Array of ordered absolute paths for the Text directories containing all Text_* files.
+     *              Strings from files loaded last will override those loaded first.
      * @param lang The language to load text resources
      * @param useCache Disable cache
      */
-    private Text(String path, String lang, boolean useCache) {
+    private Text(String[] paths, String lang, boolean useCache) {
         this.tags = new Hashtable<>();
-        this.path = path;
+        this.pathList = Arrays.asList(paths);
         this.useCache = useCache;
         this.lang = lang.toUpperCase();
+
     }
 
     /**
      * Method to preload all strings
      */
     public void preload() throws IOException {
-        getString(null);
+        if ((useCache && CacheText.getInstance().isEmpty()) || (!useCache && tags.isEmpty())) {
+            loadTextFromAllPaths();
+        }
     }
 
     /**
@@ -70,9 +75,7 @@ public class Text {
      */
     @SuppressWarnings({"SameParameterValue", "WeakerAccess"})
     public String getString(String tag) throws IOException {
-        if ((useCache && CacheText.getInstance().isEmpty()) || (!useCache && tags.isEmpty())) {
-            loadText();
-        }
+        loadTextFromAllPaths();
 
         if (tag == null) {
             return null;
@@ -88,15 +91,26 @@ public class Text {
         }
     }
 
-    private void loadText() throws IOException {
-        ArcFile arcFile;
-        String filename;
-        if (lang.matches("[A-Z]{2}")) {
+    private void loadTextFromAllPaths() throws IOException {
+        for (String p: pathList) {
+            loadText(resolveArcFilename(p));
+        }
+    }
+
+    private String resolveArcFilename(String path) {
+        String filename = null;
+        if (lang != null && lang.matches("[A-Z]{2}")) {
             filename = String.format("%s/Text_%s.arc", path, lang);
-        } else {
+        }
+
+        if((filename == null || filename.isEmpty()) || !new File(filename).exists()) {
             filename = String.format("%s/Text_EN.arc", path);
         }
-        arcFile = new ArcFile(filename);
+        return filename;
+    }
+
+    private void loadText(String filename) throws IOException {
+        ArcFile arcFile = new ArcFile(filename);
 
         for (String tf : arcFile.listRecords()) {
             byte[] d = arcFile.getData(tf);

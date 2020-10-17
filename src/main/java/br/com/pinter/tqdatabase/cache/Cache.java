@@ -4,11 +4,12 @@
 
 package br.com.pinter.tqdatabase.cache;
 
-import java.util.Hashtable;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @SuppressWarnings({"UnusedReturnValue", "SuspiciousMethodCalls"})
 abstract class Cache<K, V> {
-    private final Hashtable<K, V> cache = new Hashtable<>();
+    private final Map<K, V> cache = new ConcurrentHashMap<>();
 
     public V get(K key) {
         return cache.get(key);
