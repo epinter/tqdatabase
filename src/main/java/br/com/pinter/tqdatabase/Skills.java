@@ -14,16 +14,16 @@ import java.util.Map;
 /**
  * Class to work with Skills from game database
  */
-public class Skills implements ITQService {
+public class Skills implements TQService {
     private SkillDAO skillDAO;
 
     /**
-     * Constructor, expects a previously loaded arzFile to work with. Designed to be initialized by {@link Database} class.
+     * Constructor, uses a propertly initialized {@link DatabaseReader}. Designed to be initialized by {@link Database} class.
      *
-     * @param arzFile An instance of {@link ArzFile}
+     * @param databaseReader An instance of {@link DatabaseReader}
      */
-    Skills(ArzFile arzFile) {
-        skillDAO = new SkillDAO(arzFile);
+    Skills(DatabaseReader databaseReader) {
+        skillDAO = new SkillDAO(databaseReader);
     }
 
     /**

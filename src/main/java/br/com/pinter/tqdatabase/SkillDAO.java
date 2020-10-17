@@ -17,16 +17,16 @@ import java.util.stream.Collectors;
 
 class SkillDAO implements BaseDAO {
     private Map<String, Skill> skillList;
-    private ArzFile arzFile;
+    private final DatabaseReader databaseReader;
     private final System.Logger logger = Util.getLogger(SkillDAO.class.getName());
 
-    SkillDAO(ArzFile arzFile) {
-        this.arzFile = arzFile;
+    SkillDAO(DatabaseReader databaseReader) {
+        this.databaseReader = databaseReader;
     }
 
     @Override
-    public DbRecord getRecord(String recordPath) {
-        return arzFile.getRecord(recordPath);
+    public DatabaseReader getDatabaseReader() {
+        return databaseReader;
     }
 
     @Override

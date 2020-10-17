@@ -15,17 +15,17 @@ import java.util.Hashtable;
 import java.util.List;
 
 public class PcDAO implements BaseDAO {
-    private ArzFile arzFile;
+    private final DatabaseReader databaseReader;
     private Pc pc;
     private final System.Logger logger = Util.getLogger(PcDAO.class.getName());
 
     @Override
-    public DbRecord getRecord(String recordPath) {
-        return arzFile.getRecord(recordPath);
+    public DatabaseReader getDatabaseReader() {
+        return databaseReader;
     }
 
-    public PcDAO(ArzFile arzFile) {
-        this.arzFile = arzFile;
+    public PcDAO(DatabaseReader databaseReader) {
+        this.databaseReader = databaseReader;
     }
 
     @Override

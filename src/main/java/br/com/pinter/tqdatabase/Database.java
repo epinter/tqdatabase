@@ -16,21 +16,21 @@ import java.io.IOException;
  */
 @SuppressWarnings({"WeakerAccess", "unused"})
 public class Database {
-    private Skills skills;
-    private Player player;
-    private Teleports teleports;
+    private final Skills skills;
+    private final Player player;
+    private final Teleports teleports;
     private String fileName;
-    private ArzFile arzFile;
+    private final DatabaseReader databaseReader;
 
     /**
      * @param fileName The absolute path of the database.arz file.
      * @throws IOException if the file can't be read or parsed.
      */
     public Database(String fileName) throws IOException {
-        arzFile = new ArzFile(fileName);
-        skills = new Skills(arzFile);
-        player = new Player(arzFile);
-        teleports = new Teleports(arzFile);
+        databaseReader = new DatabaseReader(fileName);
+        skills = new Skills(databaseReader);
+        player = new Player(databaseReader);
+        teleports = new Teleports(databaseReader);
     }
 
     /**
@@ -43,32 +43,24 @@ public class Database {
     }
 
     /**
-     * Returns a specific {@link DbRecord}
-     *
-     * @param recordPath The path to read the record from.
-     * @return A {@link DbRecord} instance
+     * @see DatabaseReader#getRecord(String)
      */
     public DbRecord getRecord(String recordPath) {
-        return arzFile.getRecord(recordPath);
+        return databaseReader.getRecord(recordPath);
     }
 
     /**
-     * Remove <b><code>recordId</code></b> from cache
-     *
-     * @param recordId The record-path to remove from cache
+     * @see DatabaseReader#invalidateCacheEntry(String)
      */
     public void invalidateCacheEntry(String recordId) {
-        arzFile.invalidateCacheEntry(recordId);
+        databaseReader.invalidateCacheEntry(recordId);
     }
 
     /**
-     * Test if the record-path exists
-     *
-     * @param recordId The record to test
-     * @return <b><code>true</code></b> if exists, <b><code>false</code></b> if not
+     * @see DatabaseReader#recordExists(String)
      */
     public boolean recordExists(String recordId) {
-        return arzFile.exists(recordId);
+        return databaseReader.recordExists(recordId);
     }
 
     /**

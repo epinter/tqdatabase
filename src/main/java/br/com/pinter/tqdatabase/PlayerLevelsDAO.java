@@ -14,17 +14,17 @@ import java.util.Hashtable;
 import java.util.List;
 
 public class PlayerLevelsDAO implements BaseDAO {
-    private ArzFile arzFile;
+    private final DatabaseReader databaseReader;
     private PlayerLevels playerLevels;
     private final System.Logger logger = Util.getLogger(PlayerLevelsDAO.class.getName());
 
     @Override
-    public DbRecord getRecord(String recordPath) {
-        return arzFile.getRecord(recordPath);
+    public DatabaseReader getDatabaseReader() {
+        return databaseReader;
     }
 
-    public PlayerLevelsDAO(ArzFile arzFile) {
-        this.arzFile = arzFile;
+    public PlayerLevelsDAO(DatabaseReader databaseReader) {
+        this.databaseReader = databaseReader;
     }
 
     @Override

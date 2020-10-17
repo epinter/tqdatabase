@@ -4,6 +4,6 @@
 
 package br.com.pinter.tqdatabase;
 
-public interface ITQService {
+public interface TQService {
     public void preload() throws Exception;
 }

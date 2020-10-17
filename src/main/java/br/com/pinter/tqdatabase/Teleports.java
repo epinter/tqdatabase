@@ -6,15 +6,15 @@ package br.com.pinter.tqdatabase;
 
 import br.com.pinter.tqdatabase.models.Teleport;
 
-public class Teleports implements ITQService {
+public class Teleports implements TQService {
     final private TeleportDAO teleportDAO;
 
     @Override
     public void preload() {
     }
 
-    Teleports(ArzFile arzFile) {
-        teleportDAO = new TeleportDAO(arzFile);
+    Teleports(DatabaseReader databaseReader) {
+        teleportDAO = new TeleportDAO(databaseReader);
     }
 
     public Teleport getTeleport(String recordPath) {

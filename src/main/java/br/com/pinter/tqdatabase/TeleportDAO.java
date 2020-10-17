@@ -12,16 +12,16 @@ import br.com.pinter.tqdatabase.util.Util;
 import java.util.List;
 
 public class TeleportDAO implements BaseDAO{
-    private ArzFile arzFile;
+    private final DatabaseReader databaseReader;
     private final System.Logger logger = Util.getLogger(TeleportDAO.class.getName());
 
-    public TeleportDAO(ArzFile arzFile) {
-        this.arzFile = arzFile;
+    public TeleportDAO(DatabaseReader databaseReader) {
+        this.databaseReader = databaseReader;
     }
 
     @Override
-    public DbRecord getRecord(String recordPath) {
-        return arzFile.getRecord(recordPath);
+    public DatabaseReader getDatabaseReader() {
+        return databaseReader;
     }
 
     @Override

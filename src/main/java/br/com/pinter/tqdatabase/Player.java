@@ -7,13 +7,13 @@ package br.com.pinter.tqdatabase;
 import br.com.pinter.tqdatabase.models.Pc;
 import br.com.pinter.tqdatabase.models.PlayerLevels;
 
-public class Player implements ITQService {
-    private PlayerLevelsDAO playerLevelsDAO;
-    private PcDAO pcDAO;
+public class Player implements TQService {
+    private final PlayerLevelsDAO playerLevelsDAO;
+    private final PcDAO pcDAO;
 
-    public Player(ArzFile arzFile) {
-        playerLevelsDAO = new PlayerLevelsDAO(arzFile);
-        pcDAO = new PcDAO(arzFile);
+    public Player(DatabaseReader databaseReader) {
+        playerLevelsDAO = new PlayerLevelsDAO(databaseReader);
+        pcDAO = new PcDAO(databaseReader);
     }
 
     @Override
