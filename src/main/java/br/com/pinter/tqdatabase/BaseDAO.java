@@ -20,6 +20,10 @@ interface BaseDAO {
         return getDatabaseReader().getRecord(recordPath);
     }
 
+    default boolean recordExists(String recordPath) {
+        return getDatabaseReader().recordExists(recordPath);
+    }
+
     default BaseType getSpawnObject(DbRecord rs) {
         if(rs == null) {
             return null;

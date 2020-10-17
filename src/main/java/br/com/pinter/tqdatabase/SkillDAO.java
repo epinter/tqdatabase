@@ -245,10 +245,20 @@ class SkillDAO implements BaseDAO {
         return s;
     }
 
+    private DbRecord getRecordPc() {
+        String path;
+        if (recordExists(Constants.RECORD_PC)) {
+            path = Constants.RECORD_PC;
+        } else {
+            path = Constants.RECORD_PC_LEGACY;
+        }
+        return getRecord(path);
+    }
+
     public List<DbRecord> getSkillTreeRecords() {
         LinkedHashMap<String, DbRecord> skills = new LinkedHashMap<>();
 
-        List<DbVariable> varList = Util.filterRecordVariables(getRecord(Constants.RECORD_PC),
+        List<DbVariable> varList = Util.filterRecordVariables(getRecordPc(),
                 Constants.REGEXP_FIELD_SKILLTREE);
 
         if (varList == null) {

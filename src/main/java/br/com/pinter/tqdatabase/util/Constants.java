@@ -5,6 +5,7 @@
 package br.com.pinter.tqdatabase.util;
 
 public class Constants {
+    public static final String RECORD_PC_LEGACY = "records\\creature\\pc\\malepc01.dbr";
     public static final String RECORD_PC = "records\\xpack\\creatures\\pc\\malepc01.dbr";
     public static final String REGEXP_PATH_SKILLTREE = "(?i:^records(\\\\xpack.*)?\\\\skills\\\\.*dbr)";
     public static final String REGEXP_PATH_SKILL = "(?i:^records(\\\\xpack.*)?\\\\skills(?!\\\\old|shrine)\\\\.*dbr)";
