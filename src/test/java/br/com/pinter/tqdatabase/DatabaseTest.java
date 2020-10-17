@@ -4,6 +4,7 @@
 
 package br.com.pinter.tqdatabase;
 
+import br.com.pinter.tqdatabase.cache.CacheDbRecord;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -17,6 +18,7 @@ public class DatabaseTest {
 
     @Before
     public void init() throws IOException {
+        CacheDbRecord.getInstance().clear();
         if(!new File("src/test/resources/database.arz").exists()) {
             throw new IOException("File src/test/resources/database.arz is missing," +
                     " copy the database to execute the tests");

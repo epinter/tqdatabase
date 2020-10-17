@@ -6,6 +6,7 @@ package br.com.pinter.tqdatabase;
 
 import br.com.pinter.tqdatabase.Database;
 import br.com.pinter.tqdatabase.Skills;
+import br.com.pinter.tqdatabase.cache.CacheDbRecord;
 import br.com.pinter.tqdatabase.models.DbRecord;
 import br.com.pinter.tqdatabase.models.Pet;
 import br.com.pinter.tqdatabase.models.Skill;
@@ -23,6 +24,7 @@ public class BaseDAOTest {
 
     @Before
     public void init() throws IOException {
+        CacheDbRecord.getInstance().clear();
         if(!new File("src/test/resources/database.arz").exists()) {
             throw new IOException("File src/test/resources/database.arz is missing," +
                     " copy the database to execute the tests");
