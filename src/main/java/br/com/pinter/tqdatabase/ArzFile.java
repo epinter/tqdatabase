@@ -21,18 +21,11 @@ class ArzFile {
     private final ByteBuffer arzBuffer;
     private String[] stringsTable;
     private Hashtable<String, DbRecord> recordsMetadata;
-    private final boolean useCache;
     private final System.Logger logger = Util.getLogger(ArzFile.class.getName());
     private final String fileName;
 
     @SuppressWarnings("WeakerAccess")
     public ArzFile(String fileName) throws IOException {
-        this(fileName, true);
-    }
-
-    @SuppressWarnings("WeakerAccess")
-    public ArzFile(String fileName, boolean useCache) throws IOException {
-        this.useCache = useCache;
         this.fileName = fileName;
 
         // ARZ header file format
@@ -186,10 +179,6 @@ class ArzFile {
             throw new IOException(String.format("Record not found '%s'", id));
         }
 
-        if (useCache && CacheDbRecord.getInstance().containsKey(id)) {
-            return CacheDbRecord.getInstance().get(id);
-        }
-
         byte[] data = recordDecompress(id);
         ByteBuffer buffer = ByteBuffer.wrap(data).order(ByteOrder.LITTLE_ENDIAN);
 
@@ -242,9 +231,6 @@ class ArzFile {
             i += (2 + valCount);
         }
 
-        if (useCache) {
-            CacheDbRecord.getInstance().put(id, record);
-        }
         return record;
     }
 
