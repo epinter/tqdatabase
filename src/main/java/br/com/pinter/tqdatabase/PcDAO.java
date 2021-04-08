@@ -34,12 +34,24 @@ public class PcDAO implements BaseDAO {
     }
 
     public Pc getPc() {
-        if (pc != null) {
+        return getPc(Pc.Gender.MALE);
+    }
+
+    public Pc getPc(Pc.Gender gender) {
+        if (pc != null && gender.equals(pc.getGender())) {
             return pc;
         }
+
         Pc p = new Pc();
-        DbRecord r = getRecord(Constants.RECORD_PC);
-        if(r == null) {
+        String recordGender = Constants.RECORD_PC_MALE;
+
+        if(gender.equals(Pc.Gender.FEMALE)) {
+            recordGender = Constants.RECORD_PC_FEMALE;
+        }
+
+        DbRecord r = getRecord(recordGender);
+
+        if (r == null) {
             throw new RuntimeException("player character record not found in database)");
         }
         List<DbVariable> skillTreeVars = Util.filterRecordVariables(r, Constants.REGEXP_FIELD_SKILLTREE);
@@ -51,6 +63,7 @@ public class PcDAO implements BaseDAO {
             p.setCharacterStrength((Float) dbVariables.get("characterStrength").getFirstValue());
             p.setCharacterIntelligence((Float) dbVariables.get("characterIntelligence").getFirstValue());
             p.setCharacterDexterity((Float) dbVariables.get("characterDexterity").getFirstValue());
+            p.setPlayerTextures(dbVariables.get("playerTextures").getListString());
             HashMap<String, String> list = new HashMap<>();
 
             if (skillTreeVars != null) {

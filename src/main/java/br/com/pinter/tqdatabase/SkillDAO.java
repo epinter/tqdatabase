@@ -247,8 +247,8 @@ class SkillDAO implements BaseDAO {
 
     private DbRecord getRecordPc() {
         String path;
-        if (recordExists(Constants.RECORD_PC)) {
-            path = Constants.RECORD_PC;
+        if (recordExists(Constants.RECORD_PC_MALE)) {
+            path = Constants.RECORD_PC_MALE;
         } else {
             path = Constants.RECORD_PC_LEGACY;
         }

@@ -5,6 +5,7 @@
 package br.com.pinter.tqdatabase.models;
 
 import java.util.HashMap;
+import java.util.List;
 
 public class Pc {
     private Float characterLife;
@@ -13,6 +14,13 @@ public class Pc {
     private Float characterIntelligence;
     private Float characterDexterity;
     private HashMap<String,String> skillTreeTable;
+    private Gender gender = Gender.MALE;
+    private List<String> playerTextures;
+
+    public enum Gender {
+        MALE,
+        FEMALE
+    }
 
     public Float getCharacterLife() {
         return characterLife;
@@ -62,6 +70,22 @@ public class Pc {
         this.skillTreeTable = skillTreeTable;
     }
 
+    public Gender getGender() {
+        return gender;
+    }
+
+    public void setGender(Gender gender) {
+        this.gender = gender;
+    }
+
+    public List<String> getPlayerTextures() {
+        return playerTextures;
+    }
+
+    public void setPlayerTextures(List<String> playerTextures) {
+        this.playerTextures = playerTextures;
+    }
+
     @Override
     public String toString() {
         return "Pc{" +
@@ -71,6 +95,8 @@ public class Pc {
                 ", characterIntelligence=" + characterIntelligence +
                 ", characterDexterity=" + characterDexterity +
                 ", skillTreeTable=" + skillTreeTable +
+                ", gender=" + gender +
+                ", playerTextures=" + playerTextures +
                 '}';
     }
 }

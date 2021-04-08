@@ -26,7 +26,12 @@ public class Player implements TQService {
         return playerLevelsDAO.getPlayerLevels();
     }
 
+    public Pc getPc(Pc.Gender gender) {
+        return pcDAO.getPc(gender);
+    }
+
     public Pc getPc() {
         return pcDAO.getPc();
     }
+
 }

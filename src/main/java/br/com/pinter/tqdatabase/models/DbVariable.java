@@ -9,7 +9,7 @@ import java.util.*;
 public class DbVariable {
     private String variableName;
     private DbVariable.Type type;
-    private final ArrayList<Object> values = new ArrayList<>();
+    private final List<Object> values = new ArrayList<>();
 
     public String getVariableName() {
         return variableName;
@@ -19,7 +19,7 @@ public class DbVariable {
         this.variableName = variableName;
     }
 
-    public ArrayList<Object> getValues() {
+    public List<Object> getValues() {
         return values;
     }
 

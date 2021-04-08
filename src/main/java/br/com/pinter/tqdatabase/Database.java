@@ -5,7 +5,6 @@
 package br.com.pinter.tqdatabase;
 
 import br.com.pinter.tqdatabase.models.DbRecord;
-import br.com.pinter.tqdatabase.util.Constants;
 import br.com.pinter.tqdatabase.util.Util;
 
 import java.io.IOException;

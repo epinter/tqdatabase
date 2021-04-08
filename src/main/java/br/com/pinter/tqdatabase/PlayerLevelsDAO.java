@@ -66,7 +66,7 @@ public class PlayerLevelsDAO implements BaseDAO {
     }
 
     public DbRecord getPlayerLevelRecord() {
-        List<DbVariable> dbVariables = Util.filterRecordVariables(getRecord(Constants.RECORD_PC),
+        List<DbVariable> dbVariables = Util.filterRecordVariables(getRecord(Constants.RECORD_PC_MALE),
                 Database.Variables.LEVEL_FILE_NAME);
 
         if (dbVariables != null && dbVariables.size() > 0) {
