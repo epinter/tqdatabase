@@ -8,8 +8,8 @@ import br.com.pinter.tqdatabase.cache.CacheDbRecord;
 import br.com.pinter.tqdatabase.models.Skill;
 import br.com.pinter.tqdatabase.util.Constants;
 import br.com.pinter.tqdatabase.util.Util;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,7 +19,7 @@ import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class SkillDAOTestLegacy {
     private Skills skills;
@@ -29,7 +29,7 @@ public class SkillDAOTestLegacy {
      *
      * @throws IOException
      */
-    @Before
+    @BeforeEach
     public void init() throws IOException {
         String tqDb = "src/test/resources/disc_tqit/tq-database.arz";
         String tqitDb = "src/test/resources/disc_tqit/tqit-database.arz";

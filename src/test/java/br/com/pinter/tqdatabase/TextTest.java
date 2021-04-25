@@ -5,18 +5,18 @@
 package br.com.pinter.tqdatabase;
 
 import br.com.pinter.tqdatabase.cache.CacheText;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TextTest {
     private Text text;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         CacheText.getInstance().clear();
         if (!new File("src/test/resources/Text_EN.arc").exists()) {

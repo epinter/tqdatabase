@@ -8,20 +8,20 @@ import br.com.pinter.tqdatabase.Database;
 import br.com.pinter.tqdatabase.Skills;
 import br.com.pinter.tqdatabase.cache.CacheDbRecord;
 import br.com.pinter.tqdatabase.models.Skill;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class SkillDAOTest {
     private Skills skills;
 
-    @Before
+    @BeforeEach
     public void init() throws IOException {
         CacheDbRecord.getInstance().clear();
         if(!new File("src/test/resources/database.arz").exists()) {

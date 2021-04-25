@@ -8,19 +8,19 @@ import br.com.pinter.tqdatabase.cache.CacheDbRecord;
 import br.com.pinter.tqdatabase.models.DbRecord;
 import br.com.pinter.tqdatabase.models.DbVariable;
 import br.com.pinter.tqdatabase.util.Util;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class UtilTest {
     private Database database;
 
-    @Before
+    @BeforeEach
     public void init() throws IOException {
         CacheDbRecord.getInstance().clear();
         if(!new File("src/test/resources/database.arz").exists()) {
