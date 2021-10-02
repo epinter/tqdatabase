@@ -7,7 +7,7 @@ apply plugin: 'java-library'
 group 'br.com.pinter.tqdatabase'
 version '0.2'
 
-sourceCompatibility = 14
+sourceCompatibility = JavaVersion.VERSION_17
 
 repositories {
     mavenCentral()
