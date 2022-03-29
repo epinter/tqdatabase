@@ -40,7 +40,7 @@ public class DbVariable {
     }
 
     public List<String> getListString() {
-        if (type == Type.String) {
+        if (type == Type.STRING) {
             List<String> list = new ArrayList<>();
             values.forEach(f -> list.add((String) f));
             return list;
@@ -49,7 +49,7 @@ public class DbVariable {
     }
 
     public List<Integer> getListInteger() {
-        if (type == Type.Integer) {
+        if (type == Type.INTEGER) {
             List<Integer> list = new ArrayList<>();
             values.forEach(f -> list.add((Integer) f));
             return list;
@@ -66,11 +66,11 @@ public class DbVariable {
     }
 
     public enum Type {
-        Unknown(4),
-        String(2),
-        Integer(0),
-        Float(1),
-        Boolean(3);
+        UNKNOWN(4),
+        STRING(2),
+        INTEGER(0),
+        FLOAT(1),
+        BOOLEAN(3);
 
         private final int value;
 
@@ -80,7 +80,7 @@ public class DbVariable {
 
         public static Type valueOf(int value) {
             Optional<Type> o = Arrays.stream(values()).filter(v -> v.value == value).findFirst();
-            return o.orElse(Type.Unknown);
+            return o.orElse(Type.UNKNOWN);
         }
     }
 }

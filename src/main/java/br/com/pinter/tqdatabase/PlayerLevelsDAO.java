@@ -10,8 +10,8 @@ import br.com.pinter.tqdatabase.models.PlayerLevels;
 import br.com.pinter.tqdatabase.util.Constants;
 import br.com.pinter.tqdatabase.util.Util;
 
-import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 
 public class PlayerLevelsDAO implements BaseDAO {
     private final DatabaseReader databaseReader;
@@ -39,9 +39,9 @@ public class PlayerLevelsDAO implements BaseDAO {
 
         DbRecord r = getPlayerLevelRecord();
         if(r == null) {
-            throw new RuntimeException("playerlevels record not found in database");
+            throw new IllegalStateException("playerlevels record not found in database");
         }
-        Hashtable<String, DbVariable> variables = r.getVariables();
+        Map<String, DbVariable> variables = r.getVariables();
         PlayerLevels p = new PlayerLevels();
         p.setSkillModifierPoints((Integer) variables.get("skillModifierPoints").getFirstValue());
         p.setManaIncrement((Integer) variables.get("manaIncrement").getFirstValue());
@@ -59,7 +59,7 @@ public class PlayerLevelsDAO implements BaseDAO {
                 || p.getDexterityIncrement() <= 0
                 || p.getManaIncrement() <= 0
                 || p.getLifeIncrement() <= 0) {
-            throw new RuntimeException("illegal value reading database (playerlevels)");
+            throw new IllegalStateException("illegal value reading database (playerlevels)");
         }
         playerLevels = p;
         return playerLevels;
@@ -69,9 +69,9 @@ public class PlayerLevelsDAO implements BaseDAO {
         List<DbVariable> dbVariables = Util.filterRecordVariables(getRecord(Constants.RECORD_PC_MALE),
                 Database.Variables.LEVEL_FILE_NAME);
 
-        if (dbVariables != null && dbVariables.size() > 0) {
+        if (dbVariables != null && !dbVariables.isEmpty()) {
             DbVariable v = dbVariables.get(0);
-            if (v != null && v.getType() == DbVariable.Type.String && v.getValues().size() == 1) {
+            if (v != null && v.getType() == DbVariable.Type.STRING && v.getValues().size() == 1) {
                 DbRecord record = getRecord((String) dbVariables.get(0).getFirstValue());
                 logger.log(System.Logger.Level.DEBUG, "playerLevels: found ''{0}''", record);
                 return record;

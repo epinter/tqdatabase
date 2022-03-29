@@ -13,11 +13,11 @@ import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class TextTest {
+class TextTest {
     private Text text;
 
     @BeforeEach
-    public void setUp() throws Exception {
+    void setUp() throws Exception {
         CacheText.getInstance().clear();
         if (!new File("src/test/resources/Text_EN.arc").exists()) {
             throw new IOException("File src/test/resources/Text_EN.arc doesnt exists." +
@@ -27,14 +27,14 @@ public class TextTest {
     }
 
     @Test
-    public void getString_Given_Tag_Then_returnText() throws IOException {
+    void getString_Given_Tag_Then_returnText() throws IOException {
         assertNotNull(text.getString("tagGreeceQ1UiTitle"));
-        assertNotEquals(text.getString("tagGreeceQ1UiTitle"), "tagGreeceQ1UiTitle");
+        assertNotEquals("tagGreeceQ1UiTitle", text.getString("tagGreeceQ1UiTitle"));
         CacheText.getInstance().clear();
     }
 
     @Test
-    public void loadText_Should_loadAllStringsAndReturnNull() throws IOException {
+    void loadText_Should_loadAllStringsAndReturnNull() throws IOException {
         assertNull(text.getString(null));
         assertTrue(CacheText.getInstance().size() > 2);
     }

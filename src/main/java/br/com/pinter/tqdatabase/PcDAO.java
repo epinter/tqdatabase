@@ -11,8 +11,8 @@ import br.com.pinter.tqdatabase.util.Constants;
 import br.com.pinter.tqdatabase.util.Util;
 
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 
 public class PcDAO implements BaseDAO {
     private final DatabaseReader databaseReader;
@@ -52,10 +52,10 @@ public class PcDAO implements BaseDAO {
         DbRecord r = getRecord(recordGender);
 
         if (r == null) {
-            throw new RuntimeException("player character record not found in database)");
+            throw new IllegalStateException("player character record not found in database)");
         }
         List<DbVariable> skillTreeVars = Util.filterRecordVariables(r, Constants.REGEXP_FIELD_SKILLTREE);
-        Hashtable<String, DbVariable> dbVariables = r.getVariables();
+        Map<String, DbVariable> dbVariables = r.getVariables();
 
         if (dbVariables != null && dbVariables.size() > 0) {
             p.setCharacterLife((Float) dbVariables.get("characterLife").getFirstValue());
@@ -64,7 +64,7 @@ public class PcDAO implements BaseDAO {
             p.setCharacterIntelligence((Float) dbVariables.get("characterIntelligence").getFirstValue());
             p.setCharacterDexterity((Float) dbVariables.get("characterDexterity").getFirstValue());
             p.setPlayerTextures(dbVariables.get("playerTextures").getListString());
-            HashMap<String, String> list = new HashMap<>();
+            Map<String, String> list = new HashMap<>();
 
             if (skillTreeVars != null) {
                 for (DbVariable v : skillTreeVars) {
@@ -81,7 +81,7 @@ public class PcDAO implements BaseDAO {
                     || p.getCharacterMana() <= 0
                     || p.getSkillTreeTable() == null
                     || p.getSkillTreeTable().size() == 0) {
-                throw new RuntimeException("illegal value reading database (pc)");
+                throw new IllegalStateException("illegal value reading database (pc)");
             }
         }
         logger.log(System.Logger.Level.DEBUG, "pc: found ''{0}''", p);

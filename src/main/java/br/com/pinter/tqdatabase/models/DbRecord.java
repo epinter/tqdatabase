@@ -6,9 +6,7 @@ package br.com.pinter.tqdatabase.models;
 
 import br.com.pinter.tqdatabase.Database;
 
-import java.util.Collections;
-import java.util.Hashtable;
-import java.util.List;
+import java.util.*;
 
 public class DbRecord {
     private String id;
@@ -16,7 +14,7 @@ public class DbRecord {
     private String recordType;
     private int offset;
 
-    private Hashtable<String, DbVariable> variables = new Hashtable<>();
+    private Map<String, DbVariable> variables = new HashMap<>();
 
     public String getId() {
         return id;
@@ -50,11 +48,11 @@ public class DbRecord {
         this.offset = offset;
     }
 
-    public Hashtable<String, DbVariable> getVariables() {
+    public Map<String, DbVariable> getVariables() {
         return variables;
     }
 
-    public void setVariables(Hashtable<String, DbVariable> variables) {
+    public void setVariables(Map<String, DbVariable> variables) {
         this.variables = variables;
     }
 

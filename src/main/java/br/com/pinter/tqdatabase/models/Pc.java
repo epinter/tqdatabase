@@ -4,8 +4,8 @@
 
 package br.com.pinter.tqdatabase.models;
 
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Pc {
     private Float characterLife;
@@ -13,7 +13,7 @@ public class Pc {
     private Float characterStrength;
     private Float characterIntelligence;
     private Float characterDexterity;
-    private HashMap<String,String> skillTreeTable;
+    private Map<String,String> skillTreeTable;
     private Gender gender = Gender.MALE;
     private List<String> playerTextures;
 
@@ -62,11 +62,11 @@ public class Pc {
         this.characterDexterity = characterDexterity;
     }
 
-    public HashMap<String, String> getSkillTreeTable() {
+    public Map<String, String> getSkillTreeTable() {
         return skillTreeTable;
     }
 
-    public void setSkillTreeTable(HashMap<String, String> skillTreeTable) {
+    public void setSkillTreeTable(Map<String, String> skillTreeTable) {
         this.skillTreeTable = skillTreeTable;
     }
 

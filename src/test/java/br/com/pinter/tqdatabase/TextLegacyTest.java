@@ -13,11 +13,11 @@ import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class TextLegacyTest {
+class TextLegacyTest {
     private Text text;
 
     @BeforeEach
-    public void setUp() throws Exception {
+    void setUp() throws Exception {
         CacheText.getInstance().clear();
         String tqText = "src/test/resources/disc_tqit/Text-tq";
         String tqitText = "src/test/resources/disc_tqit/Resources-tqit";
@@ -29,14 +29,14 @@ public class TextLegacyTest {
     }
 
     @Test
-    public void getString_Given_Tag_Then_returnText() throws IOException {
+    void getString_Given_Tag_Then_returnText() throws IOException {
         assertNotNull(text.getString("xtagxSQLocation07"));
-        assertNotEquals(text.getString("xtagxSQLocation07"), "xtagxSQLocation07");
+        assertNotEquals("xtagxSQLocation07", text.getString("xtagxSQLocation07"));
         CacheText.getInstance().clear();
     }
 
     @Test
-    public void loadText_Should_loadAllStringsAndReturnNull() throws IOException {
+    void loadText_Should_loadAllStringsAndReturnNull() throws IOException {
         assertNull(text.getString(null));
         assertTrue(CacheText.getInstance().size() > 2);
     }

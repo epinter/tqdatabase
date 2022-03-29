@@ -81,12 +81,18 @@ public class Database {
     }
 
     public static class Classes {
+        private Classes() {
+        }
+
         public static final String SKILL_SPAWNPET = "Skill_SpawnPet";
         public static final String PET = "Pet";
         public static final String SKILL_MASTERY = "Skill_Mastery";
     }
 
     public static class Variables {
+        private Variables() {
+        }
+
         public static final String CLASS = "Class";
         public static final String CHARACTER_RACIAL_PROFILE = "characterRacialProfile";
         public static final String ACTOR_NAME = "ActorName";

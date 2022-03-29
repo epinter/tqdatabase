@@ -4,14 +4,14 @@
 
 package br.com.pinter.tqdatabase.models;
 
-import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 
 public class Pet extends BaseType {
     private String characterRacialProfile;
     private List<Integer> charLevel;
     private String description;
-    private Hashtable<String, String> skillNameTable;
+    private Map<String, String> skillNameTable;
 
     public String getCharacterRacialProfile() {
         return characterRacialProfile;
@@ -37,11 +37,11 @@ public class Pet extends BaseType {
         this.description = description;
     }
 
-    public Hashtable<String, String> getSkillNameTable() {
+    public Map<String, String> getSkillNameTable() {
         return skillNameTable;
     }
 
-    public void setSkillNameTable(Hashtable<String, String> skillNameTable) {
+    public void setSkillNameTable(Map<String, String> skillNameTable) {
         this.skillNameTable = skillNameTable;
     }
 

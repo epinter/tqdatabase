@@ -4,6 +4,8 @@
 
 package br.com.pinter.tqdatabase;
 
+import java.io.IOException;
+
 public interface TQService {
-    public void preload() throws Exception;
+    void preload() throws IOException;
 }

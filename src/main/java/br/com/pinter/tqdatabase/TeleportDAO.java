@@ -5,15 +5,13 @@
 package br.com.pinter.tqdatabase;
 
 import br.com.pinter.tqdatabase.models.DbRecord;
-import br.com.pinter.tqdatabase.models.DbVariable;
 import br.com.pinter.tqdatabase.models.Teleport;
 import br.com.pinter.tqdatabase.util.Util;
 
-import java.util.List;
-
 public class TeleportDAO implements BaseDAO{
-    private final DatabaseReader databaseReader;
     private final System.Logger logger = Util.getLogger(TeleportDAO.class.getName());
+
+    private final DatabaseReader databaseReader;
 
     public TeleportDAO(DatabaseReader databaseReader) {
         this.databaseReader = databaseReader;
@@ -26,6 +24,7 @@ public class TeleportDAO implements BaseDAO{
 
     @Override
     public void preload() {
+        //unused
     }
 
     public Teleport getTeleport(String recordId) {
@@ -36,6 +35,7 @@ public class TeleportDAO implements BaseDAO{
             Teleport teleport = new Teleport();
             teleport.setDescription(description);
             teleport.setClassName(className);
+            logger.log(System.Logger.Level.DEBUG, "teleport: found ''{0}''", teleport);
             return teleport;
         }
 

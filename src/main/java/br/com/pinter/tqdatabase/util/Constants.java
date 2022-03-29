@@ -5,6 +5,9 @@
 package br.com.pinter.tqdatabase.util;
 
 public class Constants {
+    private Constants() {
+    }
+
     public static final String RECORD_PC_LEGACY = "records\\creature\\pc\\malepc01.dbr";
     public static final String RECORD_PC_MALE = "records\\xpack\\creatures\\pc\\malepc01.dbr";
     public static final String RECORD_PC_FEMALE = "records\\xpack\\creatures\\pc\\femalepc01.dbr";

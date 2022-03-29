@@ -7,10 +7,11 @@ package br.com.pinter.tqdatabase;
 import br.com.pinter.tqdatabase.models.Teleport;
 
 public class Teleports implements TQService {
-    final private TeleportDAO teleportDAO;
+    private final TeleportDAO teleportDAO;
 
     @Override
     public void preload() {
+        //unused
     }
 
     Teleports(DatabaseReader databaseReader) {

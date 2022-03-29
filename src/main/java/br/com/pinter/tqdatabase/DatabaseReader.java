@@ -22,13 +22,13 @@ public class DatabaseReader {
 
     public DatabaseReader(String[] fileNames, boolean useCache) throws IOException {
         this.useCache = useCache;
-        List<ArzFile> arzFiles = new ArrayList<>();
+        List<ArzFile> files = new ArrayList<>();
         for (String f : fileNames) {
             if (f != null)
-                arzFiles.add(new ArzFile(f));
+                files.add(new ArzFile(f));
         }
 
-        this.arzFiles = arzFiles;
+        this.arzFiles = files;
     }
 
     /**

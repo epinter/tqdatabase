@@ -9,41 +9,41 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @SuppressWarnings({"UnusedReturnValue", "SuspiciousMethodCalls"})
 abstract class Cache<K, V> {
-    private final Map<K, V> cache = new ConcurrentHashMap<>();
+    private final Map<K, V> data = new ConcurrentHashMap<>();
 
     public V get(K key) {
-        return cache.get(key);
+        return data.get(key);
     }
 
     public V put(K key, V value) {
-        return cache.put(key, value);
+        return data.put(key, value);
     }
 
     public V remove(K key) {
-        return cache.remove(key);
+        return data.remove(key);
     }
 
     public void clear() {
-        cache.clear();
+        data.clear();
     }
 
     public boolean remove(K key, V value) {
-        return cache.remove(key, value);
+        return data.remove(key, value);
     }
 
     public boolean containsValue(Object value) {
-        return cache.containsValue(value);
+        return data.containsValue(value);
     }
 
     public boolean containsKey(Object key) {
-        return cache.containsKey(key);
+        return data.containsKey(key);
     }
 
     public int size() {
-        return cache.size();
+        return data.size();
     }
 
     public boolean isEmpty() {
-        return cache.isEmpty();
+        return data.isEmpty();
     }
 }

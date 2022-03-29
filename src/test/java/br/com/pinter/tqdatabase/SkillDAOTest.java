@@ -4,8 +4,6 @@
 
 package br.com.pinter.tqdatabase;
 
-import br.com.pinter.tqdatabase.Database;
-import br.com.pinter.tqdatabase.Skills;
 import br.com.pinter.tqdatabase.cache.CacheDbRecord;
 import br.com.pinter.tqdatabase.models.Skill;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,11 +16,11 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class SkillDAOTest {
+class SkillDAOTest {
     private Skills skills;
 
     @BeforeEach
-    public void init() throws IOException {
+    void init() throws IOException {
         CacheDbRecord.getInstance().clear();
         if(!new File("src/test/resources/database.arz").exists()) {
             throw new IOException("File src/test/resources/database.arz is missing," +
@@ -34,14 +32,14 @@ public class SkillDAOTest {
 
 
     @Test
-    public void getMasteries_Should_returnListOfMasteries() {
+    void getMasteries_Should_returnListOfMasteries() {
         assertNotNull(skills.getMasteries());
         assertTrue(skills.getMasteries().size() > 0);
         assertTrue(skills.getMasteries().get(0).isMastery());
     }
 
     @Test
-    public void getSkill_Should_returnOneSkill() {
+    void getSkill_Should_returnOneSkill() {
         assertNotNull(skills.getSkillList());
         Optional<Skill> first = skills.getSkillList().values().stream().findFirst();
         assertTrue(first.isPresent());
@@ -51,13 +49,13 @@ public class SkillDAOTest {
     }
 
     @Test
-    public void getSkillList_Should_returnListOfSkills() {
+    void getSkillList_Should_returnListOfSkills() {
         assertNotNull(skills.getSkillList());
         assertTrue(skills.getSkillList().size() > 0);
     }
 
     @Test
-    public void getSkillsFromMastery_Given_mastery_Then_returnSkillsFromMastery() {
+    void getSkillsFromMastery_Given_mastery_Then_returnSkillsFromMastery() {
         for (Skill mastery:skills.getMasteries()) {
             List<Skill> list =  skills.getSkillsFromMastery(mastery);
             assertNotNull(list);

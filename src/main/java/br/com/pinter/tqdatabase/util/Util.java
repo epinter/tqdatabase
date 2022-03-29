@@ -15,6 +15,10 @@ public class Util {
         return System.getLogger(name);
     }
 
+    private Util() {
+    }
+
+
     public static List<DbVariable> filterRecordVariables(DbRecord r, String regexp) {
         if (r == null) {
             return null;

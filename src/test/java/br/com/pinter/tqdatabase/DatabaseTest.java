@@ -13,11 +13,11 @@ import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class DatabaseTest {
+class DatabaseTest {
     private Database database;
 
     @BeforeEach
-    public void init() throws IOException {
+    void init() throws IOException {
         CacheDbRecord.getInstance().clear();
         if(!new File("src/test/resources/database.arz").exists()) {
             throw new IOException("File src/test/resources/database.arz is missing," +
@@ -27,7 +27,7 @@ public class DatabaseTest {
     }
 
     @Test
-    public void getSkillDAO_Should_returnSkillDAO() {
+    void getSkillDAO_Should_returnSkillDAO() {
         Skills skills = database.skills();
         assertNotNull(skills);
     }

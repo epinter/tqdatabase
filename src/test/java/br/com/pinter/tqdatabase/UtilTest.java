@@ -17,11 +17,11 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class UtilTest {
+class UtilTest {
     private Database database;
 
     @BeforeEach
-    public void init() throws IOException {
+    void init() throws IOException {
         CacheDbRecord.getInstance().clear();
         if(!new File("src/test/resources/database.arz").exists()) {
             throw new IOException("File src/test/resources/database.arz is missing," +
@@ -31,7 +31,7 @@ public class UtilTest {
     }
 
     @Test
-    public void filterRecordVariables_Given_dbRecordRegexp_Then_returnMatchVariableList() {
+    void filterRecordVariables_Given_dbRecordRegexp_Then_returnMatchVariableList() {
         DbRecord r = database.getRecord("RECORDS\\GAME\\GAMEENGINE.DBR");
         List<DbVariable> dbVariables = Util.filterRecordVariables(r, "(?i)potionstacklimit");
         assertNotNull(dbVariables);
@@ -39,19 +39,19 @@ public class UtilTest {
     }
 
     @Test
-    public void filterRecordVariables_Given_invalidDbRecordRegexp_Then_returnNull() {
+     void filterRecordVariables_Given_invalidDbRecordRegexp_Then_returnNull() {
         DbRecord r = database.getRecord("xxx");
         assertNull(r);
     }
 
     @Test
-    public void normalizeRecordPath_Given_Path_Then_returnNormalized() {
-        assertEquals(Util.normalizeRecordPath("records/game/gameengine.dbr"),
-                "RECORDS\\GAME\\GAMEENGINE.DBR");
+    void normalizeRecordPath_Given_Path_Then_returnNormalized() {
+        assertEquals("RECORDS\\GAME\\GAMEENGINE.DBR",
+                Util.normalizeRecordPath("records/game/gameengine.dbr"));
     }
 
     @Test
-    public void normalizeRecordPath_Given_null_Then_returnNull() {
+    void normalizeRecordPath_Given_null_Then_returnNull() {
         assertNull(Util.normalizeRecordPath(null));
     }
 

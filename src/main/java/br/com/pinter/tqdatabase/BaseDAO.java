@@ -9,8 +9,9 @@ import br.com.pinter.tqdatabase.models.DbRecord;
 import br.com.pinter.tqdatabase.models.DbVariable;
 import br.com.pinter.tqdatabase.models.Pet;
 
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @SuppressWarnings("WeakerAccess")
 interface BaseDAO {
@@ -54,14 +55,14 @@ interface BaseDAO {
     }
 
     @SuppressWarnings("SameParameterValue")
-    default Hashtable<String, String> getVarTableString(DbRecord r, String prefix) {
+    default Map<String, String> getVarTableString(DbRecord r, String prefix) {
         if (r == null || r.getVariables().isEmpty()) {
             return null;
         }
-        Hashtable<String, String> table = new Hashtable<>();
+        Map<String, String> table = new HashMap<>();
         for (String k : r.getVariables().keySet()) {
             if (k.matches(prefix + "\\d+")) {
-                if (r.getVariables().get(k).getType() == DbVariable.Type.String) {
+                if (r.getVariables().get(k).getType() == DbVariable.Type.STRING) {
                     table.put(k, (String) r.getVariables().get(k).getValues().get(0));
                 }
             }
@@ -69,11 +70,11 @@ interface BaseDAO {
         return table;
     }
 
-    default Hashtable<String, DbVariable> getVarTable(DbRecord r, String prefix) {
+    default Map<String, DbVariable> getVarTable(DbRecord r, String prefix) {
         if (r == null || r.getVariables().isEmpty()) {
             return null;
         }
-        Hashtable<String, DbVariable> table = new Hashtable<>();
+        Map<String, DbVariable> table = new HashMap<>();
         for (String k : r.getVariables().keySet()) {
             if (k.matches(prefix + "\\d+")) {
                 table.put(k, r.getVariables().get(k));
@@ -82,17 +83,17 @@ interface BaseDAO {
         return table;
     }
 
-    default DbVariable getVariableFromVarTableIndex(Hashtable<String, DbVariable> table, int index) {
-        for (String k : table.keySet()) {
-            String strIdx = k.replaceAll("[a-zA-Z]+(\\d+)$", "$1");
+    default DbVariable getVariableFromVarTableIndex(Map<String, DbVariable> table, int index) {
+        for (Map.Entry<String, DbVariable> k: table.entrySet()) {
+            String strIdx = k.getKey().replaceAll("[a-zA-Z]+(\\d+)$", "$1");
             int idx;
             try {
                 idx = Integer.parseInt(strIdx);
                 if (index == idx) {
-                    return table.get(k);
+                    return k.getValue();
                 }
-            } catch (Exception e) {
-                continue;
+            } catch (NumberFormatException ignored) {
+                //ignored
             }
         }
         return null;

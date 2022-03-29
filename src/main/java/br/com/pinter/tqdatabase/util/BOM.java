@@ -8,6 +8,9 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 public class BOM {
+    private BOM() {
+    }
+
     private static final byte[] BOM_UTF8 = new byte[]{(byte) 0xef, (byte) 0xbb, (byte) 0xbf};
     private static final byte[] BOM_UTF16LE = new byte[]{(byte) 0xff, (byte) 0xfe};
     private static final byte[] BOM_UTF16BE = new byte[]{(byte) 0xfe, (byte) 0xff};

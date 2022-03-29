@@ -13,14 +13,15 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.zip.DataFormatException;
 import java.util.zip.Inflater;
 
 class ArcFile {
     private final ByteBuffer arcBuffer;
-    private Hashtable<String, ArcEntry> records;
+    private Map<String, ArcEntry> records;
     private final System.Logger logger = Util.getLogger(ArcFile.class.getName());
 
     ArcFile(String fileName) throws IOException {
@@ -52,9 +53,9 @@ class ArcFile {
 
         File file = new File(fileName);
         arcBuffer = ByteBuffer.allocate((Math.toIntExact(file.length()))).order(ByteOrder.LITTLE_ENDIAN);
-        FileChannel in = new FileInputStream(file).getChannel();
-        in.read(arcBuffer);
-        in.close();
+        try (FileChannel in = new FileInputStream(file).getChannel()) {
+            in.read(arcBuffer);
+        }
         arcBuffer.rewind();
 
         if (arcBuffer.get() != 0x41
@@ -80,9 +81,9 @@ class ArcFile {
 
         logger.log(System.Logger.Level.TRACE, "numEntries:''{0}'' numPars:''{1}'' tocOffset:''{2}''", numEntries, numParts, tocOffset);
 
-        Hashtable<Integer, ArcPart> parts = new Hashtable<>();
-        Hashtable<Integer, ArcEntry> entries = new Hashtable<>();
-        records = new Hashtable<>();
+        Map<Integer, ArcPart> parts = new HashMap<>();
+        Map<Integer, ArcEntry> entries = new HashMap<>();
+        records = new HashMap<>();
 
         for (int i = 0; i < numParts; i++) {
             ArcPart part = new ArcPart();
@@ -214,7 +215,7 @@ class ArcFile {
 
             logger.log(System.Logger.Level.TRACE, "buffer size ''{0}''", buffer.length);
         } catch (DataFormatException e) {
-            e.printStackTrace();
+            logger.log(System.Logger.Level.ERROR, e);
         }
         return buffer;
     }

@@ -51,9 +51,9 @@ class SkillDAO implements BaseDAO {
 
     public Skill getSkill(String recordPath, boolean resolve) {
         Instant i = Instant.now();
-        Map<String, Skill> skillList = getSkillList();
+        Map<String, Skill> skills = getSkillList();
         logger.log(System.Logger.Level.TRACE, "Skill List generation took " + Duration.between(i, Instant.now()));
-        Skill skill = skillList.get(Util.normalizeRecordPath(recordPath));
+        Skill skill = skills.get(Util.normalizeRecordPath(recordPath));
 
         if (skill == null) {
             return null;
@@ -75,7 +75,7 @@ class SkillDAO implements BaseDAO {
         if (this.skillList != null) {
             return this.skillList;
         }
-        Hashtable<String, Skill> skillList = new Hashtable<>();
+        Map<String, Skill> skills = new HashMap<>();
 
         List<DbRecord> skillTreeRecords = getSkillTreeRecords();
 
@@ -86,24 +86,24 @@ class SkillDAO implements BaseDAO {
         skillTreeRecords.forEach(f -> {
             DbRecord r = getRecord(f.getId());
             if (r == null) {
-                throw new RuntimeException("Error parsing record (skillTree)" + f.getId());
+                throw new IllegalStateException("Error parsing record (skillTree)" + f.getId());
             }
 
             DbRecord skillNameVarsRecord = getRecord(r.getId());
             if (skillNameVarsRecord == null) {
-                throw new RuntimeException("Error parsing record (skillName)" + f.getId());
+                throw new IllegalStateException("Error parsing record (skillName)" + f.getId());
             }
 
             List<DbVariable> skillNameVars = Util.filterRecordVariables(skillNameVarsRecord, Constants.REGEXP_FIELD_SKILLNAME);
-            Hashtable<String, DbVariable> skillLevelVars = getVarTable(r, Database.Variables.PREFIX_SKILL_LEVEL);
+            Map<String, DbVariable> skillLevelVars = getVarTable(r, Database.Variables.PREFIX_SKILL_LEVEL);
 
             if (skillNameVars == null) {
-                throw new RuntimeException("Skill records not found, regexp failed: " + Constants.REGEXP_FIELD_SKILLNAME
+                throw new IllegalStateException("Skill records not found, regexp failed: " + Constants.REGEXP_FIELD_SKILLNAME
                         + " for record " + f.getId());
             }
 
             if (skillLevelVars == null) {
-                throw new RuntimeException("Skill level variables not parsed for record " + f.getId());
+                throw new IllegalStateException("Skill level variables not parsed for record " + f.getId());
             }
 
             List<Skill> masterySkillList = new ArrayList<>();
@@ -117,11 +117,11 @@ class SkillDAO implements BaseDAO {
                 if (skillLevelVar != null) {
                     skillLevelValue = (Integer) skillLevelVar.getFirstValue();
                 }
-                if (skillLevelValue != null && skillLevelVar.getType() == DbVariable.Type.Integer && skillLevelValue > 0) {
+                if (skillLevelValue != null && skillLevelVar.getType() == DbVariable.Type.INTEGER && skillLevelValue > 0) {
                     continue;
                 }
 
-                if (v.getType() == DbVariable.Type.String && v.getValues() != null && v.getValues().size() == 1) {
+                if (v.getType() == DbVariable.Type.STRING && v.getValues() != null && v.getValues().size() == 1) {
                     String skillPath = (String) v.getValues().get(0);
                     DbRecord rs = getRecord(skillPath);
                     if (rs == null) {
@@ -131,7 +131,7 @@ class SkillDAO implements BaseDAO {
                     }
                     DbVariable varClass = rs.getVariables().get(Database.Variables.CLASS);
 
-                    if (varClass != null && varClass.getType() == DbVariable.Type.String && varClass.getValues().size() == 1) {
+                    if (varClass != null && varClass.getType() == DbVariable.Type.STRING && varClass.getValues().size() == 1) {
                         if (varClass.getValues().get(0).equals(Database.Classes.SKILL_MASTERY)) {
                             DbVariable skillDisplayName = rs.getVariables().get(Database.Variables.SKILL_DISPLAY_NAME);
                             Skill mastery;
@@ -169,13 +169,13 @@ class SkillDAO implements BaseDAO {
                 }
             }
             for (Skill s : masterySkillList) {
-                skillList.put(s.getRecordPath(), s);
+                skills.put(s.getRecordPath(), s);
             }
         });
-        logger.log(System.Logger.Level.DEBUG, "skillList: found ''{0}''", skillList.values().size());
-        logger.log(System.Logger.Level.TRACE, "skillList: ''{0}''", skillList.keySet());
-        this.skillList = skillList;
-        return skillList;
+        logger.log(System.Logger.Level.DEBUG, "skillList: found ''{0}''", skills.values().size());
+        logger.log(System.Logger.Level.TRACE, "skillList: ''{0}''", skills.keySet());
+        this.skillList = skills;
+        return skills;
     }
 
     private Skill getSkillFromRecord(DbRecord rs) {
@@ -265,7 +265,7 @@ class SkillDAO implements BaseDAO {
             return null;
         }
         for (DbVariable v : varList) {
-            if (v.getType() == DbVariable.Type.String) {
+            if (v.getType() == DbVariable.Type.STRING) {
                 String p = (String) v.getValues().get(0);
                 if (p != null && !p.isEmpty() && !skills.containsKey(p) && p.matches(Constants.REGEXP_PATH_SKILLTREE)) {
                     String recordPath = Util.normalizeRecordPath(p);

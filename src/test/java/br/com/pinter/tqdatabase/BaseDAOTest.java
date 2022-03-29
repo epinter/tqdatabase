@@ -16,12 +16,12 @@ import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class BaseDAOTest {
+class BaseDAOTest {
     private Skills skills;
     private DbRecord record;
 
     @BeforeEach
-    public void init() throws IOException {
+    void init() throws IOException {
         CacheDbRecord.getInstance().clear();
         if(!new File("src/test/resources/database.arz").exists()) {
             throw new IOException("File src/test/resources/database.arz is missing," +
@@ -45,25 +45,25 @@ public class BaseDAOTest {
     }
 
     @Test
-    public void getSpawnObject_Given_DbRecord_Then_returnPet() {
+    void getSpawnObject_Given_DbRecord_Then_returnPet() {
         Pet pet = (Pet) skills.getSpawnObject(record);
         assertNotNull(pet);
     }
 
     @Test
-    public void getSpawnObject_Given_invalidRecord_Then_returnNull() {
+    void getSpawnObject_Given_invalidRecord_Then_returnNull() {
         Pet pet = (Pet) skills.getSpawnObject(skills.getMasteries().get(0).getDbRecord());
         assertNull(pet);
     }
 
     @Test
-    public void getSpawnObjectFromPath_Given_invalidRecord_Then_returnNull() {
+    void getSpawnObjectFromPath_Given_invalidRecord_Then_returnNull() {
         Pet pet = (Pet) skills.getSpawnObjectFromPath("RECORDS\\GAME\\GAMEENGINE.DBR");
         assertNull(pet);
     }
 
     @Test
-    public void getSpawnObjectFromPath_Given_recordPath_Then_returnPet() {
+    void getSpawnObjectFromPath_Given_recordPath_Then_returnPet() {
         Pet pet = (Pet) skills.getSpawnObjectFromPath(record.getId());
         assertNotNull(pet);
     }

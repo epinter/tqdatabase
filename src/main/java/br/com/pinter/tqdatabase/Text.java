@@ -6,18 +6,22 @@ package br.com.pinter.tqdatabase;
 
 import br.com.pinter.tqdatabase.cache.CacheText;
 import br.com.pinter.tqdatabase.util.BOM;
+import br.com.pinter.tqdatabase.util.Util;
 
 import java.io.*;
 import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Class to access Text resources from game
  */
 @SuppressWarnings("UnusedReturnValue")
 public class Text {
-    private final Hashtable<String, String> tags;
+    private final System.Logger logger = Util.getLogger(Text.class.getName());
+
+    private final Map<String, String> tags;
     private final String lang;
     private final List<String> pathList;
     private final boolean useCache;
@@ -133,7 +137,7 @@ public class Text {
                     }
                 }
             } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
+                logger.log(System.Logger.Level.ERROR, e);
                 return;
             }
         }

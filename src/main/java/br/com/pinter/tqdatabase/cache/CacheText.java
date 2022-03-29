@@ -7,20 +7,20 @@ package br.com.pinter.tqdatabase.cache;
 
 public class CacheText extends Cache<String, String> {
     private static final Object lock = new Object();
-    private static volatile CacheText _instance;
+    private static CacheText instance;
 
     public static CacheText getInstance() {
-        CacheText c = _instance;
+        CacheText c = instance;
         if (c == null) {
             synchronized (lock) {
-                c = _instance;
+                c = instance;
                 if (c == null) {
                     c = new CacheText();
-                    _instance = c;
+                    instance = c;
                 }
             }
         }
-        return _instance;
+        return instance;
     }
 
     private CacheText() {

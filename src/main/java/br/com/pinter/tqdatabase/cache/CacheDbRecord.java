@@ -8,20 +8,20 @@ import br.com.pinter.tqdatabase.models.DbRecord;
 
 public class CacheDbRecord extends Cache<String, DbRecord> {
     private static final Object lock = new Object();
-    private static volatile CacheDbRecord _instance;
+    private static CacheDbRecord instance;
 
     public static CacheDbRecord getInstance() {
-        CacheDbRecord c = _instance;
+        CacheDbRecord c = instance;
         if (c == null) {
             synchronized (lock) {
-                c = _instance;
+                c = instance;
                 if (c == null) {
                     c = new CacheDbRecord();
-                    _instance = c;
+                    instance = c;
                 }
             }
         }
-        return _instance;
+        return instance;
     }
 
     private CacheDbRecord() {

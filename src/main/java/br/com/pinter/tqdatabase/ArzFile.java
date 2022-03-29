@@ -13,14 +13,15 @@ import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.FileChannel;
-import java.util.Hashtable;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.zip.Inflater;
 import java.util.zip.InflaterInputStream;
 
 class ArzFile {
     private final ByteBuffer arzBuffer;
     private String[] stringsTable;
-    private Hashtable<String, DbRecord> recordsMetadata;
+    private Map<String, DbRecord> recordsMetadata;
     private final System.Logger logger = Util.getLogger(ArzFile.class.getName());
     private final String fileName;
 
@@ -38,8 +39,9 @@ class ArzFile {
 
         File file = new File(fileName);
         arzBuffer = ByteBuffer.allocate((Math.toIntExact(file.length()))).order(ByteOrder.LITTLE_ENDIAN);
-        FileChannel in = new FileInputStream(file).getChannel();
-        in.read(arzBuffer);
+        try (FileChannel in = new FileInputStream(file).getChannel()) {
+            in.read(arzBuffer);
+        }
         arzBuffer.rewind();
 
         logger.log(System.Logger.Level.DEBUG, "Loaded arz file (''{0}''), ''{1}'' bytes.", file.getName(), arzBuffer.capacity());
@@ -57,7 +59,6 @@ class ArzFile {
 
         readStringsTable(stringsTableStart);
         readRecordsTable(recordsTableStart, recordsTableCount);
-        in.close();
     }
 
     @Override
@@ -78,7 +79,7 @@ class ArzFile {
             try {
                 return recordDecode(recordId);
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.log(System.Logger.Level.ERROR, e);
             }
         }
         return null;
@@ -110,7 +111,7 @@ class ArzFile {
 
     // loads all records metadata
     private void readRecordsTable(int start, int count) {
-        recordsMetadata = new Hashtable<>();
+        recordsMetadata = new HashMap<>();
         logger.log(System.Logger.Level.DEBUG, "recordsMetadata table at ''{0}'' numrecords=''{1}''\n", String.format("%X", start), count);
         arzBuffer.position(start);
         for (int i = 0; i < count; i++) {
@@ -128,7 +129,7 @@ class ArzFile {
         try {
             ret = new String(data, "CP1252");
         } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
+            logger.log(System.Logger.Level.ERROR, e);
         }
         return ret;
     }
@@ -184,7 +185,7 @@ class ArzFile {
 
         if ((data.length % 4) != 0) {
             //data length not multiple of 4
-            throw new RuntimeException("corrupt data found while decoding record");
+            throw new IllegalStateException("corrupt data found while decoding record");
         }
         DbRecord record = recordsMetadata.get(id);
 
@@ -196,7 +197,7 @@ class ArzFile {
             logger.log(System.Logger.Level.TRACE, "recordDecode: ''{0}'' ''{1}'' ''{2}'' ''{3}''\n", variableName, dataType, valCount, variableId);
 
             if (dataType < 0 || dataType > 4 || variableName == null || variableName.isEmpty() || valCount < 0) {
-                throw new RuntimeException("Error parsing record " + id);
+                throw new IllegalStateException("Error parsing record " + id);
             }
 
             DbVariable v = new DbVariable();
@@ -209,15 +210,15 @@ class ArzFile {
                 //string=2 string
                 //boolean=3 int32
                 //unknown=4 int32
-                if (v.getType() == DbVariable.Type.Float) {
+                if (v.getType() == DbVariable.Type.FLOAT) {
                     float val = buffer.getFloat();
                     v.addValue(val);
-                } else if (v.getType() == DbVariable.Type.String) {
+                } else if (v.getType() == DbVariable.Type.STRING) {
                     int stringId = buffer.getInt();
                     String val = stringsTable[stringId];
                     val = val.trim().replaceAll("[\r\n]", "");
                     v.addValue(val);
-                } else if (v.getType() == DbVariable.Type.Boolean) {
+                } else if (v.getType() == DbVariable.Type.BOOLEAN) {
                     boolean val = buffer.getInt() == 1;
                     v.addValue(val);
                 } else {
@@ -251,7 +252,7 @@ class ArzFile {
             }
             logger.log(System.Logger.Level.TRACE, "buffer size ", buffer.size());
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.log(System.Logger.Level.ERROR, e);
         }
 
         return buffer.toByteArray();
