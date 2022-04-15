@@ -4,61 +4,57 @@
 
 package br.com.pinter.tqdatabase;
 
+import br.com.pinter.tqdatabase.models.StorageType;
+
 import java.util.ArrayList;
+import java.util.List;
 
 class ArcEntry {
-    private int storageType;
-    private int fileOffset;
-    private int compressedSize;
-    private int realSize;
-    private ArrayList<ArcPart> parts;
+    private final String filename;
+    private final StorageType storageType;
+    private final int fileOffset;
+    private final int compressedSize;
+    private final int realSize;
+    private final List<DataBlock> parts = new ArrayList<>();
 
-    int getStorageType() {
-        return storageType;
+    public ArcEntry(String filename, StorageType storageType, int fileOffset, int compressedSize, int realSize) {
+        this.filename = filename;
+        this.storageType = storageType;
+        this.fileOffset = fileOffset;
+        this.compressedSize = compressedSize;
+        this.realSize = realSize;
     }
 
-    void setStorageType(int storageType) {
-        this.storageType = storageType;
+    public String getFilename() {
+        return filename;
+    }
+
+    StorageType getStorageType() {
+        return storageType;
     }
 
     int getFileOffset() {
         return fileOffset;
     }
 
-    void setFileOffset(int fileOffset) {
-        this.fileOffset = fileOffset;
-    }
-
     int getCompressedSize() {
         return compressedSize;
-    }
-
-    void setCompressedSize(int compressedSize) {
-        this.compressedSize = compressedSize;
     }
 
     int getRealSize() {
         return realSize;
     }
 
-    void setRealSize(int realSize) {
-        this.realSize = realSize;
-    }
-
-    ArrayList<ArcPart> getParts() {
+    List<DataBlock> getParts() {
         return parts;
     }
 
-    void setParts(ArrayList<ArcPart> parts) {
-        this.parts = parts;
+    void addPart(int index, DataBlock part) {
+        this.parts.add(index, part);
+
     }
 
-    boolean isActive() {
-        if (this.getStorageType() == 1) {
-            return true;
-        } else {
-            return this.getParts() != null;
-        }
+    boolean isCompressed() {
+        return storageType.equals(StorageType.COMPRESSED);
     }
-
 }

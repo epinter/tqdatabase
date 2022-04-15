@@ -19,6 +19,14 @@ public class DbVariable {
         this.variableName = variableName;
     }
 
+    public boolean hasValues() {
+        return !values.isEmpty();
+    }
+
+    public int valuesCount() {
+        return values.size();
+    }
+
     public List<Object> getValues() {
         return values;
     }
@@ -37,6 +45,20 @@ public class DbVariable {
 
     public Object getFirstValue() {
         return values.get(0);
+    }
+
+    public String getFirstString() {
+        if(type == Type.STRING) {
+            return (String) values.get(0);
+        }
+        throw new IllegalStateException("DbVariable not a string");
+    }
+
+    public Integer getFirstInteger() {
+        if(type == Type.INTEGER) {
+            return (Integer) values.get(0);
+        }
+        throw new IllegalStateException("DbVariable not a string");
     }
 
     public List<String> getListString() {

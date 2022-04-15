@@ -4,6 +4,7 @@
 
 package br.com.pinter.tqdatabase;
 
+import br.com.pinter.tqdatabase.models.StorageType;
 import br.com.pinter.tqdatabase.util.Util;
 
 import java.io.File;
@@ -11,20 +12,16 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.nio.channels.FileChannel;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.zip.DataFormatException;
 import java.util.zip.Inflater;
 
 class ArcFile {
     private final ByteBuffer arcBuffer;
-    private Map<String, ArcEntry> records;
+    private final Map<String, ArcEntry> records;
     private final System.Logger logger = Util.getLogger(ArcFile.class.getName());
 
-    ArcFile(String fileName) throws IOException {
+    ArcFile(String arcFileName) throws IOException {
         // Format of an ARC file
         // 0x08 - 4 bytes = // of files
         // 0x0C - 4 bytes = // of parts
@@ -51,25 +48,28 @@ class ArcFile {
         // 4-byte int = length of filename string
         // 4-byte int = offset in directory structure for filename
 
-        File file = new File(fileName);
+        File file = new File(arcFileName);
         arcBuffer = ByteBuffer.allocate((Math.toIntExact(file.length()))).order(ByteOrder.LITTLE_ENDIAN);
-        try (FileChannel in = new FileInputStream(file).getChannel()) {
-            in.read(arcBuffer);
+        try (FileInputStream in = new FileInputStream(file)) {
+            in.getChannel().read(arcBuffer);
         }
         arcBuffer.rewind();
 
-        if (arcBuffer.get() != 0x41
-                && arcBuffer.get() != 0x52
-                && arcBuffer.get() != 0x43
-                && arcBuffer.capacity() < 33) {
+        //test magic-number("ARC") and size
+        byte[] magicNumber = new byte[3];
+        arcBuffer.get(0, magicNumber);
+        if (Arrays.compare(magicNumber, new byte[]{ 0x41, 0x52, 0x43}) != 0
+                || arcBuffer.capacity() < 33) {
             throw new IOException("invalid file");
         }
 
         arcBuffer.position(8);
 
-        int numEntries = arcBuffer.getInt();
+        int entries = arcBuffer.getInt();
         int numParts = arcBuffer.getInt();
-        arcBuffer.position(24);
+
+        //skip two bytes
+        arcBuffer.position(arcBuffer.position() + 8);
 
         int tocOffset = arcBuffer.getInt();
 
@@ -79,87 +79,56 @@ class ArcFile {
 
         arcBuffer.position(tocOffset);
 
-        logger.log(System.Logger.Level.TRACE, "numEntries:''{0}'' numPars:''{1}'' tocOffset:''{2}''", numEntries, numParts, tocOffset);
+        logger.log(System.Logger.Level.TRACE, "entries:''{0}'' numParts:''{1}'' tocOffset:''{2}''", entries, numParts, tocOffset);
 
-        Map<Integer, ArcPart> parts = new HashMap<>();
-        Map<Integer, ArcEntry> entries = new HashMap<>();
+        Map<Integer, DataBlock> parts = new HashMap<>();
         records = new HashMap<>();
 
         for (int i = 0; i < numParts; i++) {
-            ArcPart part = new ArcPart();
-            part.setFileOffset(arcBuffer.getInt());
-            part.setCompressedSize(arcBuffer.getInt());
-            part.setRealSize(arcBuffer.getInt());
-            parts.put(i, part);
+            int partFileOffset = arcBuffer.getInt();
+            int partCompressedSize = arcBuffer.getInt();
+            int partRealSize = arcBuffer.getInt();
+            parts.put(i, new DataBlock(partFileOffset, partCompressedSize, partRealSize));
         }
 
         logger.log(System.Logger.Level.TRACE, "parts hashtable:''{0}''", parts.size());
 
-
         //filenames
         int filenamesOffset = arcBuffer.position();
 
-        //file record offset from end of the file
-        int fileRecordOffset = 44 * numEntries;
+        //skip filenames, 44 bytes each file data * number of entries
+        arcBuffer.position(arcBuffer.capacity() - (44 * entries));
 
-        arcBuffer.position(arcBuffer.capacity() - fileRecordOffset);
+        for (int i = 0; i < entries; i++) {
+            StorageType entryStorageType = StorageType.valueOf(arcBuffer.getInt());
+            int entryFileOffset = arcBuffer.getInt();
+            int entryCompressedSize = arcBuffer.getInt();
+            int entryRealSize = arcBuffer.getInt();
 
-        for (int i = 0; i < numEntries; i++) {
-            ArcEntry entry = new ArcEntry();
-            entry.setStorageType(arcBuffer.getInt());
-            entry.setFileOffset(arcBuffer.getInt());
-            entry.setCompressedSize(arcBuffer.getInt());
-            entry.setRealSize(arcBuffer.getInt());
             //skip 3 ints
             arcBuffer.position(arcBuffer.position() + 12);
             int nParts = arcBuffer.getInt();
 
-            if (nParts >= 1) {
-                entry.setParts(new ArrayList<>());
-            }
-
             int firstPart = arcBuffer.getInt();
 
-            //skip 2 ints - filename length and filename offset
-            arcBuffer.position(arcBuffer.position() + 8);
+            byte[] filenameBytes = new byte[arcBuffer.getInt()];
+            int entryNameOffset = arcBuffer.getInt();
+            arcBuffer.get(filenamesOffset + entryNameOffset, filenameBytes);
+            if (filenameBytes.length > 0) {
+                ArcEntry entry = new ArcEntry(normalizeRecordPath(new String(filenameBytes, "CP1252")),
+                        entryStorageType, entryFileOffset, entryCompressedSize, entryRealSize);
+                logger.log(System.Logger.Level.TRACE, "record filename found ''{0}''({1}B length) - ''0x{2}''",
+                        entry.getFilename(), filenameBytes.length, Integer.toHexString(filenamesOffset + entryNameOffset));
 
-            if (entry.getStorageType() != 1 && entry.isActive()) {
-                for (int p = 0; p < nParts; p++) {
-                    entry.getParts().add(p, parts.get(p + firstPart));
-                }
-            }
-            entries.put(i, entry);
-        }
-        logger.log(System.Logger.Level.TRACE, "entries hashtable:''{0}''", entries.size());
-
-        //record names
-        arcBuffer.position(filenamesOffset);
-        for (int i = 0; i < numEntries; i++) {
-            ArcEntry entry = entries.get(i);
-            StringBuilder str = new StringBuilder();
-
-            if (entry.isActive()) {
-                byte buf;
-                for (; ; ) {
-                    buf = arcBuffer.get();
-                    if (buf == 0x00) {
-                        break;
-                    } else if (buf == 0x03) {
-                        arcBuffer.position(arcBuffer.position() - 1);
-                        buf = 0x00;
-                        break;
+                if (entry.isCompressed()) {
+                    for (int p = 0; p < nParts; p++) {
+                        entry.addPart(p, parts.get(p + firstPart));
                     }
-                    str.append((char) buf);
                 }
-                String recordFilename = str.toString();
-                if (!recordFilename.isEmpty()) {
-                    records.put(normalizeRecordPath(recordFilename), entry);
-                }
+                records.put(entry.getFilename(), entry);
             }
         }
-
         logger.log(System.Logger.Level.TRACE, "records hashtable:''{0}''", records.size());
-
     }
 
     public List<String> listRecords() {
@@ -184,15 +153,15 @@ class ArcFile {
 
         ArcEntry e = records.get(dataId);
         byte[] data = new byte[e.getRealSize()];
-        if (e.getStorageType() == 1 && e.getRealSize() == e.getCompressedSize()) {
+        if (e.getStorageType() == StorageType.UNCOMPRESSED && e.getRealSize() == e.getCompressedSize()) {
             arcBuffer.position(e.getFileOffset());
             arcBuffer.get(data, 0, e.getRealSize());
         } else {
             int pos = 0;
-            for (ArcPart p : e.getParts()) {
+            for (DataBlock p : e.getParts()) {
                 byte[] bufPart = decompressPart(p);
                 logger.log(System.Logger.Level.TRACE, "reading... bufsz:''{0}'' pos:''{1}'' partcsz:''{2}''",
-                        data.length, pos, p.getRealSize());
+                        data.length, pos, p.realSize());
                 System.arraycopy(bufPart, 0, data, pos, bufPart.length);
                 pos += bufPart.length;
             }
@@ -201,14 +170,14 @@ class ArcFile {
         return data;
     }
 
-    private byte[] decompressPart(ArcPart part) {
+    private byte[] decompressPart(DataBlock part) {
         logger.log(System.Logger.Level.TRACE, "reading ''{0}'' bytes part from offset ''{1}''",
-                part.getCompressedSize(), part.getFileOffset());
+                part.compressedSize(), part.fileOffset());
 
-        byte[] buffer = new byte[part.getRealSize()];
+        byte[] buffer = new byte[part.realSize()];
         Inflater inflater = new Inflater(true);
         try {
-            inflater.setInput(arcBuffer.array(), part.getFileOffset() + 2, part.getCompressedSize());
+            inflater.setInput(arcBuffer.array(), part.fileOffset() + 2, part.compressedSize());
 
             inflater.inflate(buffer);
             inflater.end();

@@ -71,6 +71,57 @@ class SkillDAO implements BaseDAO {
         }
     }
 
+    private Integer getSkillLevelFromName(DbVariable skillNameVar, Map<String, DbVariable> skillLevelVars) {
+        String strIdx = skillNameVar.getVariableName().replaceAll("[a-zA-Z]+(\\d+)$", "$1");
+
+        DbVariable skillLevelVar = getVariableFromVarTableIndex(skillLevelVars, Integer.parseInt(strIdx));
+        if (skillLevelVar != null && skillLevelVar.getType() == DbVariable.Type.INTEGER) {
+            return (Integer) skillLevelVar.getFirstValue();
+        }
+
+        return null;
+    }
+
+    private DbRecord getSkillFromName(DbVariable skillNameVar, DbRecord record) {
+        if (skillNameVar.getType() == DbVariable.Type.STRING && skillNameVar.valuesCount() == 1) {
+            String skillPath = skillNameVar.getFirstString();
+            DbRecord r = getRecord(skillPath);
+            if (r == null) {
+                logger.log(System.Logger.Level.ERROR, "Skill not found (from skilltree): %s/%s",
+                        skillPath, record.getId());
+            }
+            return r;
+        }
+
+
+        return null;
+    }
+
+    private List<DbVariable> getSkillNameVars(DbRecord record) {
+        List<DbVariable> skillNameVars = Util.filterRecordVariables(record, Constants.REGEXP_FIELD_SKILLNAME);
+
+        if (skillNameVars == null) {
+            throw new IllegalStateException("Skill records not found, regexp failed: " + Constants.REGEXP_FIELD_SKILLNAME
+                    + " for record " + record.getId());
+        }
+
+        return skillNameVars;
+    }
+
+    private Map<String, DbVariable> getSkillLevelVars(DbRecord record) {
+        Map<String, DbVariable> skillLevelVars = getVarTable(record, Database.Variables.PREFIX_SKILL_LEVEL);
+
+        if (skillLevelVars == null) {
+            throw new IllegalStateException("Skill level variables not parsed for record " + record.getId());
+        }
+
+        return skillLevelVars;
+    }
+
+    private boolean isDbVarString(DbVariable v) {
+        return v != null && v.getType() == DbVariable.Type.STRING && v.valuesCount() == 1;
+    }
+
     public Map<String, Skill> getSkillList() {
         if (this.skillList != null) {
             return this.skillList;
@@ -83,83 +134,51 @@ class SkillDAO implements BaseDAO {
             return null;
         }
 
-        skillTreeRecords.forEach(f -> {
-            DbRecord r = getRecord(f.getId());
-            if (r == null) {
-                throw new IllegalStateException("Error parsing record (skillTree)" + f.getId());
-            }
+        skillTreeRecords.forEach(record -> {
+            Objects.requireNonNull(record);
 
-            DbRecord skillNameVarsRecord = getRecord(r.getId());
-            if (skillNameVarsRecord == null) {
-                throw new IllegalStateException("Error parsing record (skillName)" + f.getId());
-            }
-
-            List<DbVariable> skillNameVars = Util.filterRecordVariables(skillNameVarsRecord, Constants.REGEXP_FIELD_SKILLNAME);
-            Map<String, DbVariable> skillLevelVars = getVarTable(r, Database.Variables.PREFIX_SKILL_LEVEL);
-
-            if (skillNameVars == null) {
-                throw new IllegalStateException("Skill records not found, regexp failed: " + Constants.REGEXP_FIELD_SKILLNAME
-                        + " for record " + f.getId());
-            }
-
-            if (skillLevelVars == null) {
-                throw new IllegalStateException("Skill level variables not parsed for record " + f.getId());
-            }
+            List<DbVariable> skillNameVars = getSkillNameVars(record);
+            Map<String, DbVariable> skillLevelVars = getSkillLevelVars(record);
 
             List<Skill> masterySkillList = new ArrayList<>();
 
             Skill currentMastery = null;
             for (DbVariable v : skillNameVars) {
-                String strIdx = v.getVariableName().replaceAll("[a-zA-Z]+(\\d+)$", "$1");
+                Integer skillLevel = getSkillLevelFromName(v, skillLevelVars);
 
-                DbVariable skillLevelVar = getVariableFromVarTableIndex(skillLevelVars, Integer.parseInt(strIdx));
-                Integer skillLevelValue = null;
-                if (skillLevelVar != null) {
-                    skillLevelValue = (Integer) skillLevelVar.getFirstValue();
-                }
-                if (skillLevelValue != null && skillLevelVar.getType() == DbVariable.Type.INTEGER && skillLevelValue > 0) {
+                DbRecord rs = getSkillFromName(v, record);
+
+                if ((skillLevel != null && skillLevel > 0) || rs == null
+                        || (!isDbVarString(rs.getVariables().get(Database.Variables.CLASS)))) {
                     continue;
                 }
 
-                if (v.getType() == DbVariable.Type.STRING && v.getValues() != null && v.getValues().size() == 1) {
-                    String skillPath = (String) v.getValues().get(0);
-                    DbRecord rs = getRecord(skillPath);
-                    if (rs == null) {
-                        logger.log(System.Logger.Level.ERROR, "Skill not found (from skilltree): %s/%s",
-                                skillPath, f.getId());
-                        continue;
+                if (rs.getFirstValue(Database.Variables.CLASS).equals(Database.Classes.SKILL_MASTERY)) {
+                    DbVariable skillDisplayName = rs.getVariables().get(Database.Variables.SKILL_DISPLAY_NAME);
+                    Skill mastery;
+                    mastery = getSkillFromRecord(rs);
+                    mastery.setMastery(true);
+                    mastery.setRecordPath(rs.getId());
+                    if (skillDisplayName != null && skillDisplayName.hasValues()) {
+                        mastery.setName(skillDisplayName.getFirstString());
                     }
-                    DbVariable varClass = rs.getVariables().get(Database.Variables.CLASS);
-
-                    if (varClass != null && varClass.getType() == DbVariable.Type.STRING && varClass.getValues().size() == 1) {
-                        if (varClass.getValues().get(0).equals(Database.Classes.SKILL_MASTERY)) {
-                            DbVariable skillDisplayName = rs.getVariables().get(Database.Variables.SKILL_DISPLAY_NAME);
-                            Skill mastery;
-                            mastery = getSkillFromRecord(rs);
-                            mastery.setMastery(true);
-                            mastery.setRecordPath(rs.getId());
-                            if (skillDisplayName != null && skillDisplayName.getValues() != null) {
-                                mastery.setName((String) skillDisplayName.getValues().get(0));
-                            }
-                            mastery.setDbRecord(rs);
-                            masterySkillList.add(mastery);
-                            currentMastery = mastery;
-                        } else if (rs.getId().matches(Constants.REGEXP_PATH_SKILL)) {
-                            Skill skill = getSkillFromRecord(rs);
-                            masterySkillList.add(skill);
-                            while (skill.isPointsToBuff() || skill.isPointsToPet()) {
-                                if (skill.isPointsToPet()) {
-                                    DbRecord rsPet = getRecord(skill.getPetPath());
-                                    skill = getSkillFromRecord(rsPet);
-                                    skill.setDbRecord(rsPet);
-                                } else if (skill.isPointsToBuff()) {
-                                    DbRecord rsBuff = getRecord(skill.getBuffPath());
-                                    skill = getSkillFromRecord(rsBuff);
-                                    skill.setDbRecord(rsBuff);
-                                }
-                                masterySkillList.add(skill);
-                            }
+                    mastery.setDbRecord(rs);
+                    masterySkillList.add(mastery);
+                    currentMastery = mastery;
+                } else if (rs.getId().matches(Constants.REGEXP_PATH_SKILL)) {
+                    Skill skill = getSkillFromRecord(rs);
+                    masterySkillList.add(skill);
+                    while (skill.isPointsToBuff() || skill.isPointsToPet()) {
+                        if (skill.isPointsToPet()) {
+                            DbRecord rsPet = getRecord(skill.getPetPath());
+                            skill = getSkillFromRecord(rsPet);
+                            skill.setDbRecord(rsPet);
+                        } else if (skill.isPointsToBuff()) {
+                            DbRecord rsBuff = getRecord(skill.getBuffPath());
+                            skill = getSkillFromRecord(rsBuff);
+                            skill.setDbRecord(rsBuff);
                         }
+                        masterySkillList.add(skill);
                     }
                 }
             }
@@ -189,11 +208,11 @@ class SkillDAO implements BaseDAO {
 
         Skill s = new Skill();
         s.setClassName(className);
-        if (buffSkillName != null && buffSkillName.getValues() != null && skillDisplayName == null) {
-            s.setBuffPath(Util.normalizeRecordPath((String) buffSkillName.getValues().get(0)));
+        if (buffSkillName != null && buffSkillName.hasValues() && skillDisplayName == null) {
+            s.setBuffPath(Util.normalizeRecordPath(buffSkillName.getFirstString()));
             s.setPointsToBuff(true);
-        } else if (petSkillName != null && petSkillName.getValues() != null && skillDisplayName == null) {
-            s.setPetPath(Util.normalizeRecordPath((String) petSkillName.getValues().get(0)));
+        } else if (petSkillName != null && petSkillName.hasValues() && skillDisplayName == null) {
+            s.setPetPath(Util.normalizeRecordPath(petSkillName.getFirstString()));
             s.setPointsToPet(true);
         }
 
@@ -206,13 +225,13 @@ class SkillDAO implements BaseDAO {
 
         s.setRecordPath(rs.getId());
         if (skillDisplayName != null) {
-            s.setName((String) skillDisplayName.getValues().get(0));
-            s.setSkillDisplayName(((String) skillDisplayName.getValues().get(0)));
+            s.setName(skillDisplayName.getFirstString());
+            s.setSkillDisplayName((skillDisplayName.getFirstString()));
         }
-        if (skillTier != null && skillTier.getValues() != null) {
-            s.setSkillTier((Integer) skillTier.getValues().get(0));
+        if (skillTier != null && skillTier.hasValues()) {
+            s.setSkillTier((Integer) skillTier.getFirstValue());
         }
-        if (skillDependancy != null && skillDependancy.getValues() != null) {
+        if (skillDependancy != null && skillDependancy.hasValues()) {
             final List<DbRecord> list = new ArrayList<>();
             skillDependancy.getValues().forEach(f -> {
                 DbRecord sdRecord = getRecord((String) f);
@@ -222,7 +241,7 @@ class SkillDAO implements BaseDAO {
             });
             s.setSkillDependancy(list);
         }
-        if (spawnObjects != null && spawnObjects.getValues() != null) {
+        if (spawnObjects != null && spawnObjects.hasValues()) {
             final List<DbRecord> list = new ArrayList<>();
             spawnObjects.getValues().forEach(f -> {
                 DbRecord soRecord = getRecord((String) f);
@@ -232,14 +251,14 @@ class SkillDAO implements BaseDAO {
             });
             s.setSpawnObjects(list);
         }
-        if (skillMaxlevel != null && skillMaxlevel.getValues() != null) {
-            s.setSkillMaxLevel((Integer) skillMaxlevel.getValues().get(0));
+        if (skillMaxlevel != null && skillMaxlevel.hasValues()) {
+            s.setSkillMaxLevel((Integer) skillMaxlevel.getFirstValue());
         }
-        if (skillUltimateLevel != null && skillUltimateLevel.getValues() != null) {
-            s.setSkillUltimateLevel((Integer) skillUltimateLevel.getValues().get(0));
+        if (skillUltimateLevel != null && skillUltimateLevel.hasValues()) {
+            s.setSkillUltimateLevel((Integer) skillUltimateLevel.getFirstValue());
         }
-        if (skillMasteryLevelRequired != null && skillMasteryLevelRequired.getValues() != null) {
-            s.setSkillMasteryLevelRequired((Integer) skillMasteryLevelRequired.getValues().get(0));
+        if (skillMasteryLevelRequired != null && skillMasteryLevelRequired.hasValues()) {
+            s.setSkillMasteryLevelRequired((Integer) skillMasteryLevelRequired.getFirstValue());
         }
         logger.log(System.Logger.Level.TRACE, "skillFromRecord: found ''{0}'': ''{1}''", s.getRecordPath(), s);
         return s;
@@ -266,7 +285,7 @@ class SkillDAO implements BaseDAO {
         }
         for (DbVariable v : varList) {
             if (v.getType() == DbVariable.Type.STRING) {
-                String p = (String) v.getValues().get(0);
+                String p = (String) v.getFirstValue();
                 if (p != null && !p.isEmpty() && !skills.containsKey(p) && p.matches(Constants.REGEXP_PATH_SKILLTREE)) {
                     String recordPath = Util.normalizeRecordPath(p);
                     DbRecord record = getRecord(recordPath);

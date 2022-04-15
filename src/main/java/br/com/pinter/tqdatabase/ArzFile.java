@@ -12,7 +12,6 @@ import br.com.pinter.tqdatabase.util.Util;
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.nio.channels.FileChannel;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.zip.Inflater;
@@ -39,8 +38,8 @@ class ArzFile {
 
         File file = new File(fileName);
         arzBuffer = ByteBuffer.allocate((Math.toIntExact(file.length()))).order(ByteOrder.LITTLE_ENDIAN);
-        try (FileChannel in = new FileInputStream(file).getChannel()) {
-            in.read(arzBuffer);
+        try (FileInputStream in = new FileInputStream(file)) {
+            in.getChannel().read(arzBuffer);
         }
         arzBuffer.rewind();
 
@@ -189,7 +188,8 @@ class ArzFile {
         }
         DbRecord record = recordsMetadata.get(id);
 
-        for (int i = 0; i < (data.length / 4); ) {
+        int readBytes = 0;
+        for (int i = 0; i < ((data.length / 4) - readBytes); ) {
             short dataType = buffer.getShort();
             short valCount = buffer.getShort();
             int variableId = buffer.getInt();
@@ -229,7 +229,9 @@ class ArzFile {
 
             }
             record.getVariables().put(v.getVariableName(), v);
-            i += (2 + valCount);
+
+            //skip 'dataType' + value size
+            readBytes += (2 + valCount);
         }
 
         return record;

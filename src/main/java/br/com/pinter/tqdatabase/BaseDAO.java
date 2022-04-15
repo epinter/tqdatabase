@@ -61,10 +61,8 @@ interface BaseDAO {
         }
         Map<String, String> table = new HashMap<>();
         for (String k : r.getVariables().keySet()) {
-            if (k.matches(prefix + "\\d+")) {
-                if (r.getVariables().get(k).getType() == DbVariable.Type.STRING) {
-                    table.put(k, (String) r.getVariables().get(k).getValues().get(0));
-                }
+            if (k.matches(prefix + "\\d+") && r.getVariables().get(k).getType() == DbVariable.Type.STRING) {
+                table.put(k, (String) r.getVariables().get(k).getValues().get(0));
             }
         }
         return table;

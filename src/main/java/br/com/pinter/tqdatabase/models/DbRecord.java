@@ -82,6 +82,19 @@ public class DbRecord {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        DbRecord dbRecord = (DbRecord) o;
+        return stringIndex == dbRecord.stringIndex && offset == dbRecord.offset && id.equals(dbRecord.id) && recordType.equals(dbRecord.recordType) && variables.equals(dbRecord.variables);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, stringIndex, recordType, offset, variables);
+    }
+
+    @Override
     public String toString() {
         return "Record{" +
                 "id='" + id + '\'' +
