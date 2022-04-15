@@ -7,25 +7,14 @@ package br.com.pinter.tqdatabase.cache;
 import br.com.pinter.tqdatabase.models.DbRecord;
 
 public class CacheDbRecord extends Cache<String, DbRecord> {
-    private static final Object lock = new Object();
-    private static CacheDbRecord instance;
+    private CacheDbRecord() {
+    }
+
+    private static class SingletonHolder {
+        private static final CacheDbRecord instance = new CacheDbRecord();
+    }
 
     public static CacheDbRecord getInstance() {
-        CacheDbRecord c = instance;
-        if (c == null) {
-            synchronized (lock) {
-                c = instance;
-                if (c == null) {
-                    c = new CacheDbRecord();
-                    instance = c;
-                }
-            }
-        }
-        return instance;
+        return SingletonHolder.instance;
     }
-
-    private CacheDbRecord() {
-
-    }
-
 }
