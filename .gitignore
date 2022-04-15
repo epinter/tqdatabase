@@ -4,7 +4,6 @@
 hs_err_pid*
 .gradle
 
-
 #### https://github.com/github/gitignore/blob/master/Global/JetBrains.gitignore
 # Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio and Webstorm
 # Reference: https://intellij-support.jetbrains.com/hc/en-us/articles/206544839
@@ -13,6 +12,15 @@ hs_err_pid*
 .idea/**/workspace.xml
 .idea/**/tasks.xml
 .idea/dictionaries
+.idea/jarRepositories.xml
+.idea/encodings.xml
+.idea/vcs.xml
+.idea/artifacts/
+.idea/misc.xml
+.idea/compiler.xml
+.idea/azureSettings.xml
+.idea/azure
+.idea/libraries-with-intellij-classes.xml
 
 # Sensitive or high-churn files:
 .idea/**/dataSources/
@@ -26,6 +34,16 @@ hs_err_pid*
 # Gradle:
 .idea/**/gradle.xml
 .idea/**/libraries
+
+# Gradle and Maven with auto-import
+# When using Gradle or Maven with auto-import, you should exclude module files,
+# since they will be recreated, and may cause churn.  Uncomment if using
+# auto-import.
+.idea/modules.xml
+.idea/*.iml
+.idea/modules
+*.iml
+*.ipr
 
 # CMake
 cmake-build-debug/
