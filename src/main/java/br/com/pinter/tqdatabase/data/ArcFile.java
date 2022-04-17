@@ -1,8 +1,24 @@
 /*
- * Copyright (C) 2021 Emerson Pinter - All Rights Reserved
+ * Copyright (C) 2022 Emerson Pinter - All Rights Reserved
  */
 
-package br.com.pinter.tqdatabase;
+/*    This file is part of TQ Database.
+
+    TQ Respec is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    TQ Database is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with TQ Respec.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+package br.com.pinter.tqdatabase.data;
 
 import br.com.pinter.tqdatabase.models.StorageType;
 import br.com.pinter.tqdatabase.util.Util;
@@ -131,7 +147,7 @@ class ArcFile {
         logger.log(System.Logger.Level.TRACE, "records hashtable:''{0}''", records.size());
     }
 
-    public List<String> listRecords() {
+    List<String> listRecords() {
         return new ArrayList<>(records.keySet());
     }
 
@@ -142,7 +158,7 @@ class ArcFile {
         return recordId.toUpperCase().replace("/", "\\");
     }
 
-    public byte[] getData(String id) {
+    byte[] getData(String id) {
         if (id == null) return null;
 
         String dataId = id.replaceAll("[^\\\\]+\\\\(.*)", "$1");

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Emerson Pinter - All Rights Reserved
+ * Copyright (C) 2022 Emerson Pinter - All Rights Reserved
  */
 
 /*    This file is part of TQ Database.
@@ -18,25 +18,11 @@
     along with TQ Respec.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package br.com.pinter.tqdatabase;
+package br.com.pinter.tqdatabase.data;
 
-import br.com.pinter.tqdatabase.data.DatabaseReader;
-import br.com.pinter.tqdatabase.data.dao.TeleportDAO;
-import br.com.pinter.tqdatabase.models.Teleport;
+import java.io.IOException;
 
-public class Teleports implements TQService {
-    private final TeleportDAO teleportDAO;
-
-    @Override
-    public void preload() {
-        //unused
-    }
-
-    Teleports(DatabaseReader databaseReader) {
-        teleportDAO = new TeleportDAO(databaseReader);
-    }
-
-    public Teleport getTeleport(String recordPath) {
-        return teleportDAO.getTeleport(recordPath);
-    }
+interface ArcEntryReader<T> {
+    T readAll(ResourceReader resourceReader) throws IOException;
+    T readFile(ResourceReader resourceReader, String filename) throws IOException;
 }

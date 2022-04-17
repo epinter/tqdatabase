@@ -1,8 +1,24 @@
 /*
- * Copyright (C) 2021 Emerson Pinter - All Rights Reserved
+ * Copyright (C) 2022 Emerson Pinter - All Rights Reserved
  */
 
-package br.com.pinter.tqdatabase;
+/*    This file is part of TQ Database.
+
+    TQ Respec is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    TQ Database is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with TQ Respec.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+package br.com.pinter.tqdatabase.data;
 
 import br.com.pinter.tqdatabase.cache.CacheDbRecord;
 import br.com.pinter.tqdatabase.models.DbRecord;
@@ -24,8 +40,7 @@ class ArzFile {
     private final System.Logger logger = Util.getLogger(ArzFile.class.getName());
     private final String fileName;
 
-    @SuppressWarnings("WeakerAccess")
-    public ArzFile(String fileName) throws IOException {
+    ArzFile(String fileName) throws IOException {
         this.fileName = fileName;
 
         // ARZ header file format
@@ -66,13 +81,12 @@ class ArzFile {
     }
 
     @SuppressWarnings({"unused", "WeakerAccess"})
-    public void invalidateCacheEntry(String recordId) {
+    void invalidateCacheEntry(String recordId) {
         recordId = Util.normalizeRecordPath(recordId);
         CacheDbRecord.getInstance().remove(recordId);
     }
 
-    @SuppressWarnings("WeakerAccess")
-    public DbRecord getRecord(String recordId) {
+    DbRecord getRecord(String recordId) {
         recordId = Util.normalizeRecordPath(recordId);
         if (exists(recordId)) {
             try {
@@ -84,8 +98,7 @@ class ArzFile {
         return null;
     }
 
-    @SuppressWarnings("WeakerAccess")
-    public boolean exists(String recordId) {
+     boolean exists(String recordId) {
         recordId = Util.normalizeRecordPath(recordId);
         return (recordId != null
                 && !recordId.isEmpty()
@@ -259,6 +272,4 @@ class ArzFile {
 
         return buffer.toByteArray();
     }
-
-
 }

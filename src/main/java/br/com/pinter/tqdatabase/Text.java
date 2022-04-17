@@ -2,23 +2,36 @@
  * Copyright (C) 2021 Emerson Pinter - All Rights Reserved
  */
 
+/*    This file is part of TQ Database.
+
+    TQ Respec is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    TQ Database is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with TQ Respec.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 package br.com.pinter.tqdatabase;
 
 import br.com.pinter.tqdatabase.cache.CacheText;
-import br.com.pinter.tqdatabase.util.BOM;
+import br.com.pinter.tqdatabase.data.ResourceReader;
 import br.com.pinter.tqdatabase.util.Util;
 
 import java.io.*;
-import java.util.Arrays;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Class to access Text resources from game
  */
-@SuppressWarnings("UnusedReturnValue")
-public class Text {
+@SuppressWarnings({"UnusedReturnValue", "unused"})
+public class Text implements TQService {
     private final System.Logger logger = Util.getLogger(Text.class.getName());
 
     private final Map<String, String> tags;
@@ -55,7 +68,7 @@ public class Text {
      * @param useCache Disable cache
      */
     private Text(String[] paths, String lang, boolean useCache) {
-        this.tags = new Hashtable<>();
+        this.tags = new HashMap<>();
         this.pathList = Arrays.asList(paths);
         this.useCache = useCache;
         this.lang = lang.toUpperCase();
@@ -77,7 +90,6 @@ public class Text {
      * @param tag The tag to search for
      * @return returns the string associated to the <b><code>tag</code></b>
      */
-    @SuppressWarnings({"SameParameterValue", "WeakerAccess"})
     public String getString(String tag) throws IOException {
         preload();
 
@@ -114,32 +126,7 @@ public class Text {
     }
 
     private void loadText(String filename) throws IOException {
-        ArcFile arcFile = new ArcFile(filename);
-
-        for (String tf : arcFile.listRecords()) {
-            byte[] d = arcFile.getData(tf);
-            try {
-                BufferedReader br = new BufferedReader(new StringReader(new String(d, BOM.toCharset(d))));
-                String line;
-                while ((line = br.readLine()) != null) {
-                    if (line.startsWith("//")) {
-                        continue;
-                    }
-                    line = line.replaceAll("//.*", "").trim();
-
-                    String[] kv = line.split("=");
-                    if (kv.length == 2 && kv[0] != null && kv[1] != null) {
-                        if (useCache) {
-                            CacheText.getInstance().put(kv[0], kv[1]);
-                        } else {
-                            tags.put(kv[0], kv[1]);
-                        }
-                    }
-                }
-            } catch (UnsupportedEncodingException e) {
-                logger.log(System.Logger.Level.ERROR, e);
-                return;
-            }
-        }
+        ResourceReader resource = ResourceReader.builder(filename).withCache(useCache).build();
+        this.tags.putAll(resource.readText());
     }
 }
