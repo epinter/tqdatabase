@@ -1,9 +1,10 @@
 /*
- * Copyright (C) 2021 Emerson Pinter - All Rights Reserved
+ * Copyright (C) 2022 Emerson Pinter - All Rights Reserved
  */
 
-package br.com.pinter.tqdatabase;
+package br.com.pinter.tqdatabasetest;
 
+import br.com.pinter.tqdatabase.Text;
 import br.com.pinter.tqdatabase.cache.CacheText;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
