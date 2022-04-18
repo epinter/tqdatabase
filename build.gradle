@@ -27,6 +27,8 @@ repositories {
 
 dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.12.0'
 }
 
@@ -55,4 +57,3 @@ compileJava {
         classpath = files()
     }
 }
-
