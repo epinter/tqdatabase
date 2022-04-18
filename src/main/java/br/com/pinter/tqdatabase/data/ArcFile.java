@@ -36,6 +36,7 @@ class ArcFile {
     private final ByteBuffer arcBuffer;
     private final Map<String, ArcEntry> records;
     private final System.Logger logger = Util.getLogger(ArcFile.class.getName());
+    private final String arcFileName;
 
     ArcFile(String arcFileName) throws IOException {
         // Format of an ARC file
@@ -63,6 +64,8 @@ class ArcFile {
         // 4-byte int = part// of first part for this file (starting at 0).
         // 4-byte int = length of filename string
         // 4-byte int = offset in directory structure for filename
+
+        this.arcFileName = arcFileName;
 
         File file = new File(arcFileName);
         arcBuffer = ByteBuffer.allocate((Math.toIntExact(file.length()))).order(ByteOrder.LITTLE_ENDIAN);
@@ -145,6 +148,10 @@ class ArcFile {
             }
         }
         logger.log(System.Logger.Level.TRACE, "records hashtable:''{0}''", records.size());
+    }
+
+    public String getArcFileName() {
+        return arcFileName;
     }
 
     List<String> listRecords() {

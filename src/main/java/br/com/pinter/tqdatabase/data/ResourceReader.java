@@ -20,6 +20,7 @@
 
 package br.com.pinter.tqdatabase.data;
 
+import br.com.pinter.tqdatabase.EntryNotFoundException;
 import br.com.pinter.tqdatabase.models.ResourceType;
 
 import java.io.IOException;
@@ -56,8 +57,13 @@ public class ResourceReader {
         return new Builder(arcFilename);
     }
 
-    public byte[] getData(String fileName) {
-        return archive.getData(fileName);
+    public byte[] getData(String fileName) throws EntryNotFoundException {
+        byte[] data = archive.getData(fileName);
+        if(data == null) {
+            throw new EntryNotFoundException(String.format("Resource '%s' was not found in archive '%s'",
+                    fileName, archive.getArcFileName()));
+        }
+        return data;
     }
 
     private <T> T read(ArcEntryReader<T> type) throws IOException {

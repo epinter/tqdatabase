@@ -22,6 +22,7 @@ package br.com.pinter.tqdatabase.data;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
 public class TextureReader implements ArcEntryReader<ByteBuffer> {
     @Override
@@ -31,6 +32,6 @@ public class TextureReader implements ArcEntryReader<ByteBuffer> {
 
     @Override
     public ByteBuffer readFile(ResourceReader resourceReader, String filename) throws IOException {
-        return ByteBuffer.wrap(resourceReader.getData(filename));
+        return ByteBuffer.wrap(resourceReader.getData(filename)).order(ByteOrder.LITTLE_ENDIAN);
     }
 }
