@@ -48,6 +48,13 @@ test {
     useJUnitPlatform()
 }
 
+task copyDeps(type: Copy) {
+    dependsOn jar
+    from configurations.runtimeClasspath
+    into "$buildDir/deps"
+}
+tasks.jar.finalizedBy(copyDeps)
+
 compileJava {
     inputs.property("moduleName", moduleName)
     doFirst {
