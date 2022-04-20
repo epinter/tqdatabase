@@ -25,8 +25,8 @@ import br.com.pinter.tqdatabase.models.DbRecord;
 import br.com.pinter.tqdatabase.models.Teleport;
 import br.com.pinter.tqdatabase.util.Util;
 
-public class TeleportDAO implements BaseDAO{
-    private final System.Logger logger = Util.getLogger(TeleportDAO.class.getName());
+public class TeleportDAO implements BaseDAO {
+    private static final System.Logger logger = Util.getLogger(TeleportDAO.class.getName());
 
     private final DatabaseReader databaseReader;
 

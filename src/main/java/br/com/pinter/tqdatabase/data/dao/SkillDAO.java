@@ -36,7 +36,7 @@ import java.util.stream.Collectors;
 public class SkillDAO implements BaseDAO {
     private Map<String, Skill> skillList;
     private final DatabaseReader databaseReader;
-    private final System.Logger logger = Util.getLogger(SkillDAO.class.getName());
+    private static final System.Logger logger = Util.getLogger(SkillDAO.class.getName());
 
     public SkillDAO(DatabaseReader databaseReader) {
         this.databaseReader = databaseReader;

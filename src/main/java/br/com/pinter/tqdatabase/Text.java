@@ -32,7 +32,7 @@ import java.util.*;
  */
 @SuppressWarnings({"UnusedReturnValue", "unused"})
 public class Text implements TQService {
-    private final System.Logger logger = Util.getLogger(Text.class.getName());
+    private static final System.Logger logger = Util.getLogger(Text.class.getName());
 
     private final Map<String, String> tags;
     private final String lang;

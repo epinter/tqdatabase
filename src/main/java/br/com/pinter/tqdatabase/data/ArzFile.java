@@ -37,7 +37,7 @@ class ArzFile {
     private final ByteBuffer arzBuffer;
     private String[] stringsTable;
     private Map<String, DbRecord> recordsMetadata;
-    private final System.Logger logger = Util.getLogger(ArzFile.class.getName());
+    private static final System.Logger logger = Util.getLogger(ArzFile.class.getName());
     private final String fileName;
 
     ArzFile(String fileName) throws IOException {

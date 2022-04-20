@@ -34,7 +34,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 class TextReader implements ArcEntryReader<Map<String, String>> {
-    private final System.Logger logger = Util.getLogger(TextReader.class.getName());
+    private static final System.Logger logger = Util.getLogger(TextReader.class.getName());
 
     private Map<String, String> readTxt(String filename, ResourceReader resourceReader) throws IOException {
         Map<String, String> ret = new HashMap<>();

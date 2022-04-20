@@ -34,7 +34,7 @@ import java.util.Map;
 public class PlayerLevelsDAO implements BaseDAO {
     private final DatabaseReader databaseReader;
     private PlayerLevels playerLevels;
-    private final System.Logger logger = Util.getLogger(PlayerLevelsDAO.class.getName());
+    private static final System.Logger logger = Util.getLogger(PlayerLevelsDAO.class.getName());
 
     @Override
     public DatabaseReader getDatabaseReader() {

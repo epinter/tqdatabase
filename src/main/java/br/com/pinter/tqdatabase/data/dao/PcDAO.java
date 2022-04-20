@@ -34,7 +34,7 @@ import java.util.Map;
 public class PcDAO implements BaseDAO {
     private final DatabaseReader databaseReader;
     private Pc pc;
-    private final System.Logger logger = Util.getLogger(PcDAO.class.getName());
+    private static final System.Logger logger = Util.getLogger(PcDAO.class.getName());
 
     @Override
     public DatabaseReader getDatabaseReader() {
