@@ -22,6 +22,7 @@ package br.com.pinter.tqdatabase.data;
 
 import br.com.pinter.tqdatabase.EntryNotFoundException;
 import br.com.pinter.tqdatabase.models.ResourceType;
+import br.com.pinter.tqdatabase.models.Texture;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -78,7 +79,7 @@ public class ResourceReader {
         return read(new TextReader());
     }
 
-    public ByteBuffer readTexture(String filename) throws IOException {
+    public Texture readTexture(String filename) throws IOException {
         return read(new TextureReader(), filename);
     }
 

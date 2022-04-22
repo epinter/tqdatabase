@@ -18,22 +18,13 @@
     along with TQ Database.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package br.com.pinter.tqdatabase.data;
+package br.com.pinter.tqdatabase.models;
 
-import br.com.pinter.tqdatabase.models.Texture;
-
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-
-public class TextureReader implements ArcEntryReader<Texture> {
-    @Override
-    public Texture readAll(ResourceReader resourceReader) throws IOException {
-        throw new IOException("not implemented");
-    }
-
-    @Override
-    public Texture readFile(ResourceReader resourceReader, String filename) throws IOException {
-        return new Texture(filename, resourceReader.getData(filename));
-    }
+public enum TextureType {
+    UNKNOWN,
+    TEXV1,
+    TEXV2,
+    DDS,
+    PNG,
+    BMP
 }
