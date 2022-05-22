@@ -33,9 +33,10 @@ import java.util.zip.DataFormatException;
 import java.util.zip.Inflater;
 
 class ArcFile {
+    private static final System.Logger logger = Util.getLogger(ArcFile.class.getName());
+
     private final ByteBuffer arcBuffer;
     private final Map<String, ArcEntry> records;
-    private final static System.Logger logger = Util.getLogger(ArcFile.class.getName());
     private final String arcFileName;
 
     ArcFile(String arcFileName) throws IOException {

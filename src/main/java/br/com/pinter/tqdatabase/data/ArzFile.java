@@ -34,10 +34,11 @@ import java.util.zip.Inflater;
 import java.util.zip.InflaterInputStream;
 
 class ArzFile {
+    private static final System.Logger logger = Util.getLogger(ArzFile.class.getName());
+
     private final ByteBuffer arzBuffer;
     private String[] stringsTable;
     private Map<String, DbRecord> recordsMetadata;
-    private static final System.Logger logger = Util.getLogger(ArzFile.class.getName());
     private final String fileName;
 
     ArzFile(String fileName) throws IOException {
