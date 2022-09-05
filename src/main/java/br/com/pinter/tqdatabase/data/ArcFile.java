@@ -120,11 +120,17 @@ class ArcFile {
         arcBuffer.position(arcBuffer.capacity() - (44 * entries));
 
         for (int i = 0; i < entries; i++) {
-            StorageType entryStorageType = StorageType.valueOf(arcBuffer.getInt());
+            int storageTypeField = arcBuffer.getInt();
             int entryFileOffset = arcBuffer.getInt();
             int entryCompressedSize = arcBuffer.getInt();
             int entryRealSize = arcBuffer.getInt();
 
+            StorageType entryStorageType;
+            if(entryRealSize == entryCompressedSize && storageTypeField == 1) {
+                entryStorageType = StorageType.UNCOMPRESSED;
+            } else {
+                entryStorageType = StorageType.COMPRESSED;
+            }
             //skip 3 ints
             arcBuffer.position(arcBuffer.position() + 12);
             int nParts = arcBuffer.getInt();
@@ -177,7 +183,7 @@ class ArcFile {
 
         ArcEntry e = records.get(dataId);
         byte[] data = new byte[e.getRealSize()];
-        if (e.getStorageType() == StorageType.UNCOMPRESSED && e.getRealSize() == e.getCompressedSize()) {
+        if (e.getStorageType() == StorageType.UNCOMPRESSED) {
             arcBuffer.position(e.getFileOffset());
             arcBuffer.get(data, 0, e.getRealSize());
         } else {
