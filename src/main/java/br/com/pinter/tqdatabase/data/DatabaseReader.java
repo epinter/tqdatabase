@@ -37,6 +37,9 @@ public class DatabaseReader {
     }
 
     public DatabaseReader(String[] fileNames, boolean useCache) throws IOException {
+        if(fileNames.length == 0) {
+            throw new IOException("no database found");
+        }
         this.useCache = useCache;
         List<ArzFile> files = new ArrayList<>();
         for (String f : fileNames) {
