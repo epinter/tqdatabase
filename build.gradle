@@ -3,6 +3,7 @@
  */
 
 apply plugin: 'java-library'
+apply plugin: 'java'
 apply plugin: 'org.sonarqube'
 
 buildscript {
@@ -19,18 +20,20 @@ buildscript {
 group 'br.com.pinter.tqdatabase'
 version '0.2'
 
-sourceCompatibility = JavaVersion.VERSION_17
+java {
+    sourceCompatibility = JavaVersion.VERSION_21
+}
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
+    testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.11.0-M2'
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
-    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.12.0'
-    implementation 'net.java.dev.jna:jna-platform-jpms:5.11.0'
+    implementation 'org.apache.commons:commons-lang3:3.14.0'
+    implementation 'net.java.dev.jna:jna-platform-jpms:5.14.0'
 }
 
 ext.moduleName = 'br.com.pinter.tqdatabase'
@@ -49,10 +52,10 @@ test {
     useJUnitPlatform()
 }
 
-task copyDeps(type: Copy) {
+tasks.register('copyDeps', Copy) {
     dependsOn jar
     from configurations.runtimeClasspath
-    into "$buildDir/deps"
+    into layout.buildDirectory.dir("deps")
 }
 tasks.jar.finalizedBy(copyDeps)
 
