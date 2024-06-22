@@ -21,6 +21,7 @@
 package br.com.pinter.tqdatabase.data;
 
 import br.com.pinter.tqdatabase.models.Texture;
+import org.apache.commons.lang3.NotImplementedException;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -29,7 +30,7 @@ import java.nio.ByteOrder;
 public class TextureReader implements ArcEntryReader<Texture> {
     @Override
     public Texture readAll(ResourceReader resourceReader) throws IOException {
-        throw new IOException("not implemented");
+        throw new NotImplementedException("not implemented");
     }
 
     @Override
