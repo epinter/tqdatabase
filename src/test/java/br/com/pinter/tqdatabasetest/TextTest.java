@@ -51,6 +51,13 @@ class TextTest {
     }
 
     @Test
+    void getString_Given_Tag_Then_returnText2() throws IOException {
+        assertNotNull(text.getString("xtagxSQLocation07"));
+        assertNotEquals("xtagxSQLocation07", text.getString("xtagxSQLocation07"));
+        CacheText.getInstance().clear();
+    }
+
+    @Test
     void loadText_Should_loadAllStringsAndReturnNull() throws IOException {
         assertNull(text.getString(null));
         assertTrue(CacheText.getInstance().size() > 2);
