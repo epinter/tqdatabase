@@ -67,7 +67,7 @@ public class Text implements TQService {
      * @param lang The language to load text resources
      * @param useCache Disable cache
      */
-    private Text(String[] paths, String lang, boolean useCache) {
+    public Text(String[] paths, String lang, boolean useCache) {
         this.tags = new HashMap<>();
         this.pathList = Arrays.asList(paths);
         this.useCache = useCache;
