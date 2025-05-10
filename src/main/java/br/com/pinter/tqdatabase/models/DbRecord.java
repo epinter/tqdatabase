@@ -29,8 +29,7 @@ public class DbRecord {
     private int stringIndex;
     private String recordType;
     private int offset;
-
-    private Map<String, DbVariable> variables = new HashMap<>();
+    private Map<String, DbVariable> variables = new LinkedHashMap<>();
 
     public String getId() {
         return id;
@@ -108,6 +107,10 @@ public class DbRecord {
     @Override
     public int hashCode() {
         return Objects.hash(id, stringIndex, recordType, offset, variables);
+    }
+
+    public List<String> asFile() {
+        return variables.values().stream().map(DbVariable::asLine).toList();
     }
 
     @Override

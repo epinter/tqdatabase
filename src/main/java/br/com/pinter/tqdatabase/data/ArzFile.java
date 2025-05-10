@@ -28,6 +28,7 @@ import br.com.pinter.tqdatabase.util.Util;
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.zip.Inflater;
@@ -81,7 +82,6 @@ class ArzFile {
         return fileName;
     }
 
-    @SuppressWarnings({"unused", "WeakerAccess"})
     void invalidateCacheEntry(String recordId) {
         recordId = Util.normalizeRecordPath(recordId);
         CacheDbRecord.getInstance().remove(recordId);
@@ -99,7 +99,7 @@ class ArzFile {
         return null;
     }
 
-     boolean exists(String recordId) {
+    boolean exists(String recordId) {
         recordId = Util.normalizeRecordPath(recordId);
         return (recordId != null
                 && !recordId.isEmpty()
@@ -272,5 +272,13 @@ class ArzFile {
         }
 
         return buffer.toByteArray();
+    }
+
+    public Path getFileName() {
+        return Path.of(fileName);
+    }
+
+    public Map<String, DbRecord> getRecordsMetadata() {
+        return recordsMetadata;
     }
 }

@@ -22,20 +22,26 @@ package br.com.pinter.tqdatabase;
 
 import br.com.pinter.tqdatabase.data.DatabaseReader;
 import br.com.pinter.tqdatabase.models.DbRecord;
+import br.com.pinter.tqdatabase.models.DbNode;
 import br.com.pinter.tqdatabase.util.Util;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
 
 /**
  * This class is designed to concentrate all access to data contained in the game database by using methods to
  * delegate to specific classes, like {@link Database#skills}
  */
-@SuppressWarnings({"WeakerAccess", "unused"})
 public class Database {
     private final Skills skills;
     private final Player player;
     private final Teleports teleports;
-    private String fileName;
     private final DatabaseReader databaseReader;
 
     /**
@@ -89,12 +95,127 @@ public class Database {
         return skills;
     }
 
-    public Player player() { return player; }
+    public Player player() {
+        return player;
+    }
 
-    public Teleports teleports() { return teleports; }
+    public Teleports teleports() {
+        return teleports;
+    }
 
     public static String normalizeRecordPath(String recordId) {
         return Util.normalizeRecordPath(recordId);
+    }
+
+    public List<Path> getLoadedDb() {
+        return databaseReader.getLoadedDb();
+    }
+
+    public Set<DbRecord> getRecordsForDb(Path arzFilename) {
+        return databaseReader.getRecordsForDb(arzFilename);
+    }
+
+    /**
+     * Creates a tree of nodes representing the database, directory nodes have record field null, DBR records contain a DbRecord instance.
+     *
+     * @param db Path to an already loaded database
+     * @return Tree
+     */
+    private DbNode getTree(Path db, boolean loadRecords) {
+        Map<Path, DbNode> nodes = new HashMap<>();
+        for (Path s : databaseReader.getLoadedDb()) {
+            if (!s.equals(Path.of(db.toString()))) {
+                continue;
+            }
+            for (var e : databaseReader.getRecordsForDb(s)) {
+                Path path = Path.of(e.getId());
+                if (!File.separator.equals("\\")) {
+                    path = Path.of(e.getId().replaceAll("\\\\", "/"));
+                }
+                for (int i = 0; i < path.getNameCount(); i++) {
+                    Path nodeName;
+                    DbNode n;
+                    if (i < path.getNameCount() - 1) {
+                        nodeName = path.subpath(0, i + 1);
+                        n = new DbNode(nodeName);
+                    } else {
+                        //DBR
+                        nodeName = path;
+                        if (loadRecords) {
+                            n = new DbNode(nodeName, getRecord(nodeName.toString()));
+                        } else {
+                            n = new DbNode(nodeName);
+                        }
+                    }
+                    if (!nodes.containsKey(n.getName())) {
+                        nodes.put(n.getName(), n);
+                    }
+                    if (nodes.containsKey(n.getName().getParent()) && !nodes.get(n.getName().getParent()).getChildren().contains(n)) {
+                        nodes.get(n.getName().getParent()).addChild(n);
+                    }
+                }
+            }
+        }
+        DbNode root = new DbNode(Path.of(File.separator));
+        nodes.values().stream().filter(f -> f.getName().getParent() == null).forEach(root::addChild);
+        return root;
+    }
+
+    /**
+     * Executes the function using the record from parameter.
+     *
+     * @param nodeRecord An object containing the tree
+     * @param function   Function to execute for each record
+     */
+    public void processTree(DbNode nodeRecord, Function<DbNode, Void> function) {
+        for (var n : nodeRecord.getChildren()) {
+            if (n.getChildren().isEmpty()) {
+                function.apply(n);
+            } else {
+                processTree(n, function);
+            }
+        }
+    }
+
+    /**
+     * Creates a tree of nodes representing the database, directory nodes have record field null, DBR records contain a DbRecord instance.
+     *
+     * @param db Path to an already loaded database
+     * @return Tree
+     */
+    public DbNode getTreeWithContent(Path db) {
+        return getTree(db, true);
+    }
+
+    /**
+     * Creates a tree of nodes representing the database. No records will be loaded.
+     *
+     * @param db Path to an already loaded database
+     * @return Tree
+     */
+    public DbNode getTree(Path db) {
+        return getTree(db, false);
+    }
+
+    /**
+     * Executes the function for each record in the database. Records are NOT loaded.
+     *
+     * @param db       A path to an already loaded database
+     * @param function Function to execute for each record
+     */
+    public void processTree(Path db, Function<DbNode, Void> function) {
+        processTree(getTree(db, false), function);
+
+    }
+
+    /**
+     * Executes the function for each record in the database. Records are loaded.
+     *
+     * @param db       A path to an already loaded database
+     * @param function Function to execute for each record
+     */
+    public void processTreeWithContent(Path db, Function<DbNode, Void> function) {
+        processTree(getTree(db, true), function);
     }
 
     public static class Classes {

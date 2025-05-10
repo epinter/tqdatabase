@@ -25,8 +25,12 @@ import br.com.pinter.tqdatabase.models.DbRecord;
 import br.com.pinter.tqdatabase.util.Util;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 public class DatabaseReader {
     private final List<ArzFile> arzFiles;
@@ -100,5 +104,14 @@ public class DatabaseReader {
             }
         }
         return false;
+    }
+
+    public List<Path> getLoadedDb() {
+        return arzFiles.stream().map(ArzFile::getFileName).toList();
+    }
+
+    public Set<DbRecord> getRecordsForDb(Path arzFilename) {
+        Optional<ArzFile> arz = arzFiles.stream().filter(db -> db.getFileName().equals(arzFilename)).findFirst();
+        return arz.map(arzFile -> Set.copyOf(arzFile.getRecordsMetadata().values())).orElse(Collections.emptySet());
     }
 }
