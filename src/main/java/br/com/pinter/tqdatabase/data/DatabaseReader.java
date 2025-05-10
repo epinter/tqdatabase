@@ -22,7 +22,6 @@ package br.com.pinter.tqdatabase.data;
 
 import br.com.pinter.tqdatabase.cache.CacheDbRecord;
 import br.com.pinter.tqdatabase.models.DbRecord;
-import br.com.pinter.tqdatabase.util.Util;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -35,7 +34,7 @@ import java.util.Set;
 import static java.lang.System.Logger.Level.INFO;
 
 public class DatabaseReader {
-    private static final System.Logger logger = Util.getLogger(DatabaseReader.class.getName());
+    private static final System.Logger logger = System.getLogger(DatabaseReader.class.getName());
     private final List<ArzFile> arzFiles;
     private final List<Path> modsAdded = new ArrayList<>();
     private final boolean useCache;
@@ -66,7 +65,7 @@ public class DatabaseReader {
      */
     public DbRecord getRecord(String recordPath) {
         DbRecord record = null;
-        String normPath = Util.normalizeRecordPath(recordPath);
+        String normPath = DbRecord.normalizeRecordPath(recordPath);
 
         if (useCache && CacheDbRecord.getInstance().containsKey(normPath)) {
             return CacheDbRecord.getInstance().get(normPath);

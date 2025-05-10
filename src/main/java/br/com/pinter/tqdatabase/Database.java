@@ -23,7 +23,6 @@ package br.com.pinter.tqdatabase;
 import br.com.pinter.tqdatabase.data.DatabaseReader;
 import br.com.pinter.tqdatabase.models.DbNode;
 import br.com.pinter.tqdatabase.models.DbRecord;
-import br.com.pinter.tqdatabase.util.Util;
 
 import java.io.File;
 import java.io.IOException;
@@ -42,7 +41,7 @@ import static java.lang.System.Logger.Level.INFO;
  * delegate to specific classes, like {@link Database#skills}
  */
 public class Database {
-    private static final System.Logger logger = Util.getLogger(Database.class.getName());
+    private static final System.Logger logger = System.getLogger(Database.class.getName());
     private final Skills skills;
     private final Player player;
     private final Teleports teleports;
@@ -116,7 +115,7 @@ public class Database {
     }
 
     public static String normalizeRecordPath(String recordId) {
-        return Util.normalizeRecordPath(recordId);
+        return DbRecord.normalizeRecordPath(recordId);
     }
 
     public List<Path> getLoadedDb() {

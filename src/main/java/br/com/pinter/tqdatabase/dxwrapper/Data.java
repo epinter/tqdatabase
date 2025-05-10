@@ -20,15 +20,13 @@
 
 package br.com.pinter.tqdatabase.dxwrapper;
 
-import br.com.pinter.tqdatabase.data.dao.TeleportDAO;
-import br.com.pinter.tqdatabase.util.Util;
 import com.sun.jna.Native;
 import com.sun.jna.Pointer;
 import com.sun.jna.Structure;
 
 @Structure.FieldOrder({"size", "content"})
 public class Data extends Structure {
-    private static final System.Logger logger = Util.getLogger(Data.class.getName());
+    private static final System.Logger logger = System.getLogger(Data.class.getName());
 
     public static class ByValue extends Data implements Structure.ByValue {
     }

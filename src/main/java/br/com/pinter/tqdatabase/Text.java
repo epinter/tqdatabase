@@ -22,10 +22,13 @@ package br.com.pinter.tqdatabase;
 
 import br.com.pinter.tqdatabase.cache.CacheText;
 import br.com.pinter.tqdatabase.data.ResourceReader;
-import br.com.pinter.tqdatabase.util.Util;
 
-import java.io.*;
-import java.util.*;
+import java.io.File;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static java.lang.System.Logger.Level.INFO;
 
@@ -34,7 +37,7 @@ import static java.lang.System.Logger.Level.INFO;
  */
 @SuppressWarnings({"UnusedReturnValue", "unused"})
 public class Text implements TQService {
-    private static final System.Logger logger = Util.getLogger(Text.class.getName());
+    private static final System.Logger logger = System.getLogger(Text.class.getName());
 
     private final Map<String, String> tags;
     private final String lang;
