@@ -21,8 +21,8 @@
 package br.com.pinter.tqdatabase;
 
 import br.com.pinter.tqdatabase.data.DatabaseReader;
-import br.com.pinter.tqdatabase.models.DbRecord;
 import br.com.pinter.tqdatabase.models.DbNode;
+import br.com.pinter.tqdatabase.models.DbRecord;
 import br.com.pinter.tqdatabase.util.Util;
 
 import java.io.File;
@@ -35,11 +35,14 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 
+import static java.lang.System.Logger.Level.INFO;
+
 /**
  * This class is designed to concentrate all access to data contained in the game database by using methods to
  * delegate to specific classes, like {@link Database#skills}
  */
 public class Database {
+    private static final System.Logger logger = Util.getLogger(Database.class.getName());
     private final Skills skills;
     private final Player player;
     private final Teleports teleports;
@@ -56,6 +59,14 @@ public class Database {
         player = new Player(databaseReader);
         teleports = new Teleports(databaseReader);
     }
+
+    public Database(String[] fileNames, boolean useCache) throws IOException {
+        databaseReader = new DatabaseReader(fileNames, useCache);
+        skills = new Skills(databaseReader);
+        player = new Player(databaseReader);
+        teleports = new Teleports(databaseReader);
+    }
+
 
     /**
      * Preloads all data, from all delegates
@@ -214,6 +225,17 @@ public class Database {
      */
     public void processTreeWithContent(Path db, Function<DbNode, Void> function) {
         processTree(getTree(db, true), function);
+    }
+
+    public void loadMod(Path dbPath) throws IOException {
+        logger.log(INFO, "Loading database from ''{0}''", dbPath);
+        databaseReader.loadMod(dbPath);
+        preloadAll();
+    }
+
+    public void unloadMods() {
+        databaseReader.unloadMods();
+        preloadAll();
     }
 
     public static class Classes {
