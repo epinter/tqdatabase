@@ -27,6 +27,8 @@ import br.com.pinter.tqdatabase.util.Util;
 import java.io.*;
 import java.util.*;
 
+import static java.lang.System.Logger.Level.INFO;
+
 /**
  * Class to access Text resources from game
  */
@@ -128,5 +130,10 @@ public class Text implements TQService {
     private void loadText(String filename) throws IOException {
         ResourceReader resource = ResourceReader.builder(filename).withCache(useCache).build();
         this.tags.putAll(resource.readText());
+    }
+
+    public void clearCache() {
+        logger.log(INFO, "Clearing text cache");
+        CacheText.getInstance().clear();
     }
 }
