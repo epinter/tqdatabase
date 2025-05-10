@@ -20,8 +20,6 @@
 
 package br.com.pinter.tqdatabase.models;
 
-import br.com.pinter.tqdatabase.util.Util;
-
 import java.util.List;
 
 public class Skill extends BaseType {
@@ -58,7 +56,7 @@ public class Skill extends BaseType {
     }
 
     public void setParentPath(String parentPath) {
-        this.parentPath = Util.normalizeRecordPath(parentPath);
+        this.parentPath = DbRecord.normalizeRecordPath(parentPath);
     }
 
     public boolean isMastery() {

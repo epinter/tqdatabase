@@ -23,9 +23,13 @@ package br.com.pinter.tqdatabase.data;
 import br.com.pinter.tqdatabase.cache.CacheDbRecord;
 import br.com.pinter.tqdatabase.models.DbRecord;
 import br.com.pinter.tqdatabase.models.DbVariable;
-import br.com.pinter.tqdatabase.util.Util;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.file.Path;
@@ -35,7 +39,7 @@ import java.util.zip.Inflater;
 import java.util.zip.InflaterInputStream;
 
 class ArzFile {
-    private static final System.Logger logger = Util.getLogger(ArzFile.class.getName());
+    private static final System.Logger logger = System.getLogger(ArzFile.class.getName());
 
     private final ByteBuffer arzBuffer;
     private String[] stringsTable;
@@ -83,12 +87,12 @@ class ArzFile {
     }
 
     void invalidateCacheEntry(String recordId) {
-        recordId = Util.normalizeRecordPath(recordId);
+        recordId = DbRecord.normalizeRecordPath(recordId);
         CacheDbRecord.getInstance().remove(recordId);
     }
 
     DbRecord getRecord(String recordId) {
-        recordId = Util.normalizeRecordPath(recordId);
+        recordId = DbRecord.normalizeRecordPath(recordId);
         if (exists(recordId)) {
             try {
                 return recordDecode(recordId);
@@ -100,7 +104,7 @@ class ArzFile {
     }
 
     boolean exists(String recordId) {
-        recordId = Util.normalizeRecordPath(recordId);
+        recordId = DbRecord.normalizeRecordPath(recordId);
         return (recordId != null
                 && !recordId.isEmpty()
                 && recordsMetadata.containsKey(recordId)
@@ -168,7 +172,7 @@ class ArzFile {
         logger.log(System.Logger.Level.TRACE, "recordMetadataGet: ''{0}'' ''{1}'' ''{2}''\n", idStringIndex, recordType, offset);
 
         DbRecord r = new DbRecord();
-        r.setId(Util.normalizeRecordPath(stringsTable[idStringIndex]));
+        r.setId(DbRecord.normalizeRecordPath(stringsTable[idStringIndex]));
         r.setStringIndex(idStringIndex);
         r.setRecordType(recordType);
         r.setOffset(offset + 24);
@@ -188,7 +192,7 @@ class ArzFile {
         // 0x04 int32 key string ID (the id into the string table for this variable name
         // 0x08 data value
 
-        String id = Util.normalizeRecordPath(recordId);
+        String id = DbRecord.normalizeRecordPath(recordId);
         if (id == null || !recordsMetadata.containsKey(id)) {
             throw new IOException(String.format("Record not found '%s'", id));
         }

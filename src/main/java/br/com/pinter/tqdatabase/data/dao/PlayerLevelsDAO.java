@@ -25,16 +25,14 @@ import br.com.pinter.tqdatabase.data.DatabaseReader;
 import br.com.pinter.tqdatabase.models.DbRecord;
 import br.com.pinter.tqdatabase.models.DbVariable;
 import br.com.pinter.tqdatabase.models.PlayerLevels;
-import br.com.pinter.tqdatabase.util.Constants;
-import br.com.pinter.tqdatabase.util.Util;
 
 import java.util.List;
 import java.util.Map;
 
 public class PlayerLevelsDAO implements BaseDAO {
+    private static final System.Logger logger = System.getLogger(PlayerLevelsDAO.class.getName());
     private final DatabaseReader databaseReader;
     private PlayerLevels playerLevels;
-    private static final System.Logger logger = Util.getLogger(PlayerLevelsDAO.class.getName());
 
     @Override
     public DatabaseReader getDatabaseReader() {
@@ -84,13 +82,13 @@ public class PlayerLevelsDAO implements BaseDAO {
     }
 
     public DbRecord getPlayerLevelRecord() {
-        List<DbVariable> dbVariables = Util.filterRecordVariables(getRecord(Constants.RECORD_PC_MALE),
+        List<DbVariable> dbVariables = DbVariable.filterRecordVariables(getRecord(Constants.RECORD_PC_MALE),
                 Database.Variables.LEVEL_FILE_NAME);
 
         if (dbVariables != null && !dbVariables.isEmpty()) {
-            DbVariable v = dbVariables.get(0);
+            DbVariable v = dbVariables.getFirst();
             if (v != null && v.getType() == DbVariable.Type.STRING && v.getValues().size() == 1) {
-                DbRecord record = getRecord((String) dbVariables.get(0).getFirstValue());
+                DbRecord record = getRecord((String) dbVariables.getFirst().getFirstValue());
                 logger.log(System.Logger.Level.DEBUG, "playerLevels: found ''{0}''", record);
                 return record;
             }

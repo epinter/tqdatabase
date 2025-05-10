@@ -26,6 +26,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class DbVariable {
     private String variableName;
@@ -154,5 +155,13 @@ public class DbVariable {
             Optional<Type> o = Arrays.stream(values()).filter(v -> v.value == value).findFirst();
             return o.orElse(Type.UNKNOWN);
         }
+    }
+
+    public static List<DbVariable> filterRecordVariables(DbRecord r, String regexp) {
+        if (r == null) {
+            return null;
+        }
+        return r.getVariables().values().stream().filter(
+                e -> e.getVariableName().matches(regexp)).collect(Collectors.toList());
     }
 }
