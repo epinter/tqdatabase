@@ -24,17 +24,15 @@ import br.com.pinter.tqdatabase.data.DatabaseReader;
 import br.com.pinter.tqdatabase.models.DbRecord;
 import br.com.pinter.tqdatabase.models.DbVariable;
 import br.com.pinter.tqdatabase.models.Pc;
-import br.com.pinter.tqdatabase.util.Constants;
-import br.com.pinter.tqdatabase.util.Util;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class PcDAO implements BaseDAO {
+    private static final System.Logger logger = System.getLogger(PcDAO.class.getName());
     private final DatabaseReader databaseReader;
     private Pc pc;
-    private static final System.Logger logger = Util.getLogger(PcDAO.class.getName());
 
     @Override
     public DatabaseReader getDatabaseReader() {
@@ -71,10 +69,10 @@ public class PcDAO implements BaseDAO {
         if (r == null) {
             throw new IllegalStateException("player character record not found in database)");
         }
-        List<DbVariable> skillTreeVars = Util.filterRecordVariables(r, Constants.REGEXP_FIELD_SKILLTREE);
+        List<DbVariable> skillTreeVars = DbVariable.filterRecordVariables(r, Constants.REGEXP_FIELD_SKILLTREE);
         Map<String, DbVariable> dbVariables = r.getVariables();
 
-        if (dbVariables != null && dbVariables.size() > 0) {
+        if (dbVariables != null && !dbVariables.isEmpty()) {
             p.setCharacterLife((Float) dbVariables.get("characterLife").getFirstValue());
             p.setCharacterMana((Float) dbVariables.get("characterMana").getFirstValue());
             p.setCharacterStrength((Float) dbVariables.get("characterStrength").getFirstValue());
@@ -97,7 +95,7 @@ public class PcDAO implements BaseDAO {
                     || p.getCharacterLife() <= 0
                     || p.getCharacterMana() <= 0
                     || p.getSkillTreeTable() == null
-                    || p.getSkillTreeTable().size() == 0) {
+                    || p.getSkillTreeTable().isEmpty()) {
                 throw new IllegalStateException("illegal value reading database (pc)");
             }
         }

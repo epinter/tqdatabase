@@ -25,18 +25,21 @@ import br.com.pinter.tqdatabase.data.DatabaseReader;
 import br.com.pinter.tqdatabase.models.DbRecord;
 import br.com.pinter.tqdatabase.models.DbVariable;
 import br.com.pinter.tqdatabase.models.Skill;
-import br.com.pinter.tqdatabase.util.Constants;
-import br.com.pinter.tqdatabase.util.Util;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class SkillDAO implements BaseDAO {
+    private static final System.Logger logger = System.getLogger(SkillDAO.class.getName());
     private Map<String, Skill> skillList;
     private final DatabaseReader databaseReader;
-    private static final System.Logger logger = Util.getLogger(SkillDAO.class.getName());
 
     public SkillDAO(DatabaseReader databaseReader) {
         this.databaseReader = databaseReader;
@@ -71,7 +74,7 @@ public class SkillDAO implements BaseDAO {
         Instant i = Instant.now();
         Map<String, Skill> skills = getSkillList();
         logger.log(System.Logger.Level.TRACE, "Skill List generation took " + Duration.between(i, Instant.now()));
-        Skill skill = skills.get(Util.normalizeRecordPath(recordPath));
+        Skill skill = skills.get(DbRecord.normalizeRecordPath(recordPath));
 
         if (skill == null) {
             return null;
@@ -116,7 +119,7 @@ public class SkillDAO implements BaseDAO {
     }
 
     private List<DbVariable> getSkillNameVars(DbRecord record) {
-        List<DbVariable> skillNameVars = Util.filterRecordVariables(record, Constants.REGEXP_FIELD_SKILLNAME);
+        List<DbVariable> skillNameVars = DbVariable.filterRecordVariables(record, Constants.REGEXP_FIELD_SKILLNAME);
 
         if (skillNameVars == null) {
             throw new IllegalStateException("Skill records not found, regexp failed: " + Constants.REGEXP_FIELD_SKILLNAME
@@ -209,7 +212,7 @@ public class SkillDAO implements BaseDAO {
                 skills.put(s.getRecordPath(), s);
             }
         });
-        logger.log(System.Logger.Level.DEBUG, "skillList: found ''{0}''", skills.values().size());
+        logger.log(System.Logger.Level.DEBUG, "skillList: found ''{0}''", skills.size());
         logger.log(System.Logger.Level.TRACE, "skillList: ''{0}''", skills.keySet());
         this.skillList = skills;
         return skills;
@@ -227,10 +230,10 @@ public class SkillDAO implements BaseDAO {
         Skill s = new Skill();
         s.setClassName(className);
         if (buffSkillName != null && buffSkillName.hasValues() && skillDisplayName == null) {
-            s.setBuffPath(Util.normalizeRecordPath(buffSkillName.getFirstString()));
+            s.setBuffPath(DbRecord.normalizeRecordPath(buffSkillName.getFirstString()));
             s.setPointsToBuff(true);
         } else if (petSkillName != null && petSkillName.hasValues() && skillDisplayName == null) {
-            s.setPetPath(Util.normalizeRecordPath(petSkillName.getFirstString()));
+            s.setPetPath(DbRecord.normalizeRecordPath(petSkillName.getFirstString()));
             s.setPointsToPet(true);
         }
 
@@ -295,7 +298,7 @@ public class SkillDAO implements BaseDAO {
     public List<DbRecord> getSkillTreeRecords() {
         LinkedHashMap<String, DbRecord> skills = new LinkedHashMap<>();
 
-        List<DbVariable> varList = Util.filterRecordVariables(getRecordPc(),
+        List<DbVariable> varList = DbVariable.filterRecordVariables(getRecordPc(),
                 Constants.REGEXP_FIELD_SKILLTREE);
 
         if (varList == null) {
@@ -305,7 +308,7 @@ public class SkillDAO implements BaseDAO {
             if (v.getType() == DbVariable.Type.STRING) {
                 String p = (String) v.getFirstValue();
                 if (p != null && !p.isEmpty() && !skills.containsKey(p) && p.matches(Constants.REGEXP_PATH_SKILLTREE)) {
-                    String recordPath = Util.normalizeRecordPath(p);
+                    String recordPath = DbRecord.normalizeRecordPath(p);
                     DbRecord record = getRecord(recordPath);
                     if (record != null) {
                         skills.put(recordPath, record);
@@ -314,7 +317,7 @@ public class SkillDAO implements BaseDAO {
             }
         }
 
-        logger.log(System.Logger.Level.DEBUG, "skillTreeRecords: found ''{0}''", skills.values().size());
+        logger.log(System.Logger.Level.DEBUG, "skillTreeRecords: found ''{0}''", skills.size());
         logger.log(System.Logger.Level.TRACE, "skillTreeRecords: ''{0}''", skills.keySet());
 
         return new ArrayList<>(skills.values());

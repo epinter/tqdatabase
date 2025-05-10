@@ -21,19 +21,22 @@
 package br.com.pinter.tqdatabase.data;
 
 import br.com.pinter.tqdatabase.models.StorageType;
-import br.com.pinter.tqdatabase.util.Util;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.zip.DataFormatException;
 import java.util.zip.Inflater;
 
 class ArcFile {
-    private static final System.Logger logger = Util.getLogger(ArcFile.class.getName());
+    private static final System.Logger logger = System.getLogger(ArcFile.class.getName());
 
     private final ByteBuffer arcBuffer;
     private final Map<String, ArcEntry> records;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Emerson Pinter - All Rights Reserved
+ * Copyright (C) 2025 Emerson Pinter - All Rights Reserved
  */
 
 /*    This file is part of TQ Database.
@@ -18,9 +18,9 @@
     along with TQ Database.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package br.com.pinter.tqdatabase.util;
+package br.com.pinter.tqdatabase.data.dao;
 
-public class Constants {
+final class Constants {
     private Constants() {
     }
 

@@ -25,7 +25,6 @@ import br.com.pinter.tqdatabase.models.ResourceType;
 import br.com.pinter.tqdatabase.models.Texture;
 
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -60,7 +59,7 @@ public class ResourceReader {
 
     public byte[] getData(String fileName) throws EntryNotFoundException {
         byte[] data = archive.getData(fileName);
-        if(data == null) {
+        if (data == null) {
             throw new EntryNotFoundException(String.format("Resource '%s' was not found in archive '%s'",
                     fileName, archive.getArcFileName()));
         }

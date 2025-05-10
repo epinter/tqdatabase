@@ -21,14 +21,11 @@
 package br.com.pinter.tqdatabase.models;
 
 import br.com.pinter.tqdatabase.dxwrapper.DxTexWrapper;
-import br.com.pinter.tqdatabase.util.Util;
 import org.apache.commons.lang3.NotImplementedException;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.nio.channels.FileChannel;
-import java.nio.channels.ScatteringByteChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.MessageDigest;
@@ -37,7 +34,7 @@ import java.util.Arrays;
 import java.util.Objects;
 
 public class Texture implements Comparable<Texture> {
-    private static final System.Logger logger = Util.getLogger(Texture.class.getName());
+    private static final System.Logger logger = System.getLogger(Texture.class.getName());
 
     private static final byte[] MAGIC_TEX = new byte[]{0x54, 0x45, 0x58};
     private static final byte[] MAGIC_PNG = new byte[]{(byte) 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A};
@@ -226,7 +223,7 @@ public class Texture implements Comparable<Texture> {
                 }
                 default -> throw new NotImplementedException(String.format(ERROR_MESSAGE, type, to));
             }
-        } else if(to.equals(TextureType.TEXV1)) {
+        } else if (to.equals(TextureType.TEXV1)) {
             switch (type) {
                 case DDS -> {
                     return new Texture(filename, convertDdsHeaderToTex(TextureType.TEXV1));
@@ -238,7 +235,7 @@ public class Texture implements Comparable<Texture> {
                 }
                 default -> throw new NotImplementedException(String.format(ERROR_MESSAGE, type, to));
             }
-        } else if(to.equals(TextureType.TEXV2)) {
+        } else if (to.equals(TextureType.TEXV2)) {
             switch (type) {
                 case DDS -> {
                     return new Texture(filename, convertDdsHeaderToTex(TextureType.TEXV2));
@@ -287,7 +284,7 @@ public class Texture implements Comparable<Texture> {
         preamble.put(byteVersion);
         preamble.putInt(0);
         int texFlagOffset = preamble.position();
-        if(version.equals(TextureType.TEXV2)) {
+        if (version.equals(TextureType.TEXV2)) {
             //alpha channel ?
             preamble.put((byte) 1);
         }

@@ -22,7 +22,11 @@ package br.com.pinter.tqdatabase.models;
 
 import br.com.pinter.tqdatabase.Database;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 public class DbRecord {
     private String id;
@@ -111,6 +115,13 @@ public class DbRecord {
 
     public List<String> asFile() {
         return variables.values().stream().map(DbVariable::asLine).toList();
+    }
+
+    public static String normalizeRecordPath(String recordId) {
+        if (recordId == null || recordId.isEmpty()) {
+            return null;
+        }
+        return recordId.toUpperCase().replace("/", "\\");
     }
 
     @Override

@@ -30,7 +30,7 @@ public class Player implements TQService {
     private final PlayerLevelsDAO playerLevelsDAO;
     private final PcDAO pcDAO;
 
-    public Player(DatabaseReader databaseReader) {
+    Player(DatabaseReader databaseReader) {
         playerLevelsDAO = new PlayerLevelsDAO(databaseReader);
         pcDAO = new PcDAO(databaseReader);
     }

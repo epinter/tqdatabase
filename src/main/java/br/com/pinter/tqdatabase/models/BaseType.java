@@ -20,8 +20,6 @@
 
 package br.com.pinter.tqdatabase.models;
 
-import br.com.pinter.tqdatabase.util.Util;
-
 public class BaseType {
     private String recordPath;
     private String className;
@@ -50,7 +48,7 @@ public class BaseType {
     }
 
     public void setRecordPath(String recordPath) {
-        this.recordPath = Util.normalizeRecordPath(recordPath);
+        this.recordPath = DbRecord.normalizeRecordPath(recordPath);
     }
 
     public DbRecord getDbRecord() {
@@ -59,6 +57,14 @@ public class BaseType {
 
     public void setDbRecord(DbRecord dbRecord) {
         this.dbRecord = dbRecord;
+    }
+
+    public String getFileDescription() {
+        return fileDescription;
+    }
+
+    public void setFileDescription(String fileDescription) {
+        this.fileDescription = fileDescription;
     }
 
     @Override

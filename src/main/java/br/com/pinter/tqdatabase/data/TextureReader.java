@@ -22,10 +22,9 @@ package br.com.pinter.tqdatabase.data;
 
 import br.com.pinter.tqdatabase.models.Texture;
 import org.apache.commons.lang3.NotImplementedException;
+import org.apache.commons.lang3.SystemUtils;
 
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 
 public class TextureReader implements ArcEntryReader<Texture> {
     @Override
@@ -35,6 +34,10 @@ public class TextureReader implements ArcEntryReader<Texture> {
 
     @Override
     public Texture readFile(ResourceReader resourceReader, String filename) throws IOException {
-        return new Texture(filename, resourceReader.getData(filename));
+        if(SystemUtils.IS_OS_WINDOWS) {
+            return new Texture(filename, resourceReader.getData(filename));
+        } else {
+            throw new NotImplementedException("Only Windows OS is supported");
+        }
     }
 }

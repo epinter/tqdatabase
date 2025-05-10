@@ -21,7 +21,6 @@
 package br.com.pinter.tqdatabase;
 
 import br.com.pinter.tqdatabase.data.ResourceReader;
-import br.com.pinter.tqdatabase.util.Util;
 import org.apache.commons.lang3.NotImplementedException;
 
 import java.io.IOException;
@@ -33,7 +32,7 @@ import java.util.Map;
  */
 @SuppressWarnings({"UnusedReturnValue", "unused"})
 public class Resources implements TQService {
-    private static final System.Logger logger = Util.getLogger(Resources.class.getName());
+    private static final System.Logger logger = System.getLogger(Resources.class.getName());
     private final String path;
 
     /**

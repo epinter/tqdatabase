@@ -24,7 +24,6 @@ import br.com.pinter.tqdatabase.Database;
 import br.com.pinter.tqdatabase.cache.CacheDbRecord;
 import br.com.pinter.tqdatabase.models.DbRecord;
 import br.com.pinter.tqdatabase.models.DbVariable;
-import br.com.pinter.tqdatabase.util.Util;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -50,7 +49,7 @@ class UtilTest {
     @Test
     void filterRecordVariables_Given_dbRecordRegexp_Then_returnMatchVariableList() {
         DbRecord r = database.getRecord("RECORDS\\GAME\\GAMEENGINE.DBR");
-        List<DbVariable> dbVariables = Util.filterRecordVariables(r, "(?i)potionstacklimit");
+        List<DbVariable> dbVariables = DbVariable.filterRecordVariables(r, "(?i)potionstacklimit");
         assertNotNull(dbVariables);
         assertFalse(dbVariables.isEmpty());
     }
@@ -64,12 +63,12 @@ class UtilTest {
     @Test
     void normalizeRecordPath_Given_Path_Then_returnNormalized() {
         assertEquals("RECORDS\\GAME\\GAMEENGINE.DBR",
-                Util.normalizeRecordPath("records/game/gameengine.dbr"));
+                DbRecord.normalizeRecordPath("records/game/gameengine.dbr"));
     }
 
     @Test
     void normalizeRecordPath_Given_null_Then_returnNull() {
-        assertNull(Util.normalizeRecordPath(null));
+        assertNull(DbRecord.normalizeRecordPath(null));
     }
 
 }
