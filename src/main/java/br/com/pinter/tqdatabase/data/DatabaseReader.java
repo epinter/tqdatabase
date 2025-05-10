@@ -32,8 +32,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import static java.lang.System.Logger.Level.INFO;
+
 public class DatabaseReader {
+    private static final System.Logger logger = Util.getLogger(DatabaseReader.class.getName());
     private final List<ArzFile> arzFiles;
+    private final List<Path> modsAdded = new ArrayList<>();
     private final boolean useCache;
 
     public DatabaseReader(String[] fileNames) throws IOException {
@@ -41,7 +45,7 @@ public class DatabaseReader {
     }
 
     public DatabaseReader(String[] fileNames, boolean useCache) throws IOException {
-        if(fileNames.length == 0) {
+        if (fileNames.length == 0) {
             throw new IOException("no database found");
         }
         this.useCache = useCache;
@@ -113,5 +117,28 @@ public class DatabaseReader {
     public Set<DbRecord> getRecordsForDb(Path arzFilename) {
         Optional<ArzFile> arz = arzFiles.stream().filter(db -> db.getFileName().equals(arzFilename)).findFirst();
         return arz.map(arzFile -> Set.copyOf(arzFile.getRecordsMetadata().values())).orElse(Collections.emptySet());
+    }
+
+    public void loadMod(Path dbPath) throws IOException {
+        arzFiles.add(new ArzFile(dbPath.toAbsolutePath().toString()));
+        modsAdded.add(dbPath);
+        logger.log(INFO, "Mod loaded, clearing database cache");
+        CacheDbRecord.getInstance().clear();
+    }
+
+    public void unloadMods() {
+        boolean removed = modsAdded.removeIf(
+                m -> {
+                    if (arzFiles.removeIf(p -> p.getFileName().equals(m))) {
+                        logger.log(INFO, "Unloaded ''{0}''", m);
+                        return true;
+                    }
+                    return false;
+                }
+        );
+        if (removed) {
+            logger.log(INFO, "Mod unloaded, clearing database cache");
+            CacheDbRecord.getInstance().clear();
+        }
     }
 }
