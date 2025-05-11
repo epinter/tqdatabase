@@ -25,11 +25,7 @@ import br.com.pinter.tqdatabase.models.DbRecord;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 import static java.lang.System.Logger.Level.INFO;
 
@@ -81,6 +77,15 @@ public class DatabaseReader {
             CacheDbRecord.getInstance().put(normPath, record);
         }
         return record;
+    }
+
+    public int getRecordCount() {
+        int count = 0;
+        for (ArzFile arzFile : arzFiles) {
+            count += arzFile.getRecordsMetadata().size();
+        }
+
+        return count;
     }
 
     /**

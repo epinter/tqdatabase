@@ -20,26 +20,40 @@
 
 package br.com.pinter.tqdatabase.models;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
+import java.util.Optional;
 
 public enum ResourceType {
     TEXT("TXT"),
     MAP("MAP"),
-    TEXTURE("TEX"),
+    TEXTURE("TEX", "DDS"),
     MESH("MSH"),
     ANIMATION("ANM"),
     AUDIO("WAV", "MP3"),
     EFFECT("PFX"),
     SHADER("SSH"),
-    QUEST("QST");
+    QUEST("QST"),
+    FONT("FNT");
 
-    private final List<String> extensions;
 
     ResourceType(String... extensions) {
         this.extensions = List.of(extensions);
     }
 
+    private final List<String> extensions;
+
     public List<String> getExtensions() {
         return extensions;
+    }
+
+    public static ResourceType of(String name) {
+        Optional<ResourceType> type = Arrays.stream(ResourceType.values()).filter(t ->
+                t.getExtensions().stream().anyMatch(e ->
+                        name.toUpperCase(Locale.ROOT).endsWith("."+e)
+                )).findFirst();
+        return type.orElse(null);
+
     }
 }

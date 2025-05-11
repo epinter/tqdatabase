@@ -25,6 +25,7 @@ import br.com.pinter.tqdatabase.models.ResourceType;
 import br.com.pinter.tqdatabase.models.Texture;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -33,7 +34,7 @@ public class ResourceReader {
     private final boolean useCache;
     private final ArcFile archive;
 
-    private ResourceReader(String archiveFilename, boolean useCache) throws IOException {
+    private ResourceReader(Path archiveFilename, boolean useCache) throws IOException {
         this.useCache = useCache;
         this.archive = new ArcFile(archiveFilename);
     }
@@ -53,15 +54,15 @@ public class ResourceReader {
         return useCache;
     }
 
-    public static Builder builder(String arcFilename) {
+    public static Builder builder(Path arcFilename) {
         return new Builder(arcFilename);
     }
 
-    public byte[] getData(String fileName) throws EntryNotFoundException {
-        byte[] data = archive.getData(fileName);
+    public byte[] getData(String resourceName) throws EntryNotFoundException {
+        byte[] data = archive.getData(resourceName);
         if (data == null) {
             throw new EntryNotFoundException(String.format("Resource '%s' was not found in archive '%s'",
-                    fileName, archive.getArcFileName()));
+                    resourceName, archive.getArcFileName()));
         }
         return data;
     }
@@ -70,23 +71,23 @@ public class ResourceReader {
         return type.readAll(this);
     }
 
-    private <T> T read(ArcEntryReader<T> type, String filename) throws IOException {
-        return type.readFile(this, filename);
+    private <T> T read(ArcEntryReader<T> type, String resourceName) throws IOException {
+        return type.readFile(this, resourceName);
     }
 
     public Map<String, String> readText() throws IOException {
         return read(new TextReader());
     }
 
-    public Texture readTexture(String filename) throws IOException {
-        return read(new TextureReader(), filename);
+    public Texture readTexture(String resourceName) throws IOException {
+        return read(new TextureReader(), resourceName);
     }
 
     public static class Builder {
         private boolean useCache = false;
-        private final String archiveFilename;
+        private final Path archiveFilename;
 
-        public Builder(String archiveFilename) {
+        public Builder(Path archiveFilename) {
             this.archiveFilename = archiveFilename;
         }
 
