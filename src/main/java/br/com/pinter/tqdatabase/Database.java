@@ -126,6 +126,10 @@ public class Database {
         return databaseReader.getRecordsForDb(arzFilename);
     }
 
+    public int getRecordCount() {
+        return databaseReader.getRecordCount();
+    }
+
     /**
      * Creates a tree of nodes representing the database, directory nodes have record field null, DBR records contain a DbRecord instance.
      *

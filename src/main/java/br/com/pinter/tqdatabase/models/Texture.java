@@ -23,17 +23,16 @@ package br.com.pinter.tqdatabase.models;
 import br.com.pinter.tqdatabase.dxwrapper.DxTexWrapper;
 import org.apache.commons.lang3.NotImplementedException;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Objects;
 
-public class Texture implements Comparable<Texture> {
+import static java.lang.System.Logger.Level.DEBUG;
+
+public class Texture extends ResourceFile implements Comparable<Texture> {
     private static final System.Logger logger = System.getLogger(Texture.class.getName());
 
     private static final byte[] MAGIC_TEX = new byte[]{0x54, 0x45, 0x58};
@@ -50,24 +49,23 @@ public class Texture implements Comparable<Texture> {
     private static final int DDSD_WIDTH = 0x4;
 
     private static final String ERROR_MESSAGE = "conversion from '%s' to '%s' is not implemented";
-    private final Path filename;
-    private final byte[] data;
+    private final String filename;
     private TextureType type = TextureType.UNKNOWN;
     private int textureSize;
     private int width;
     private int height;
     private final byte[] md5sum;
 
-    public Texture(Path filename, byte[] data) {
+    public Texture(String filename, byte[] data) {
+        super(filename, data, ResourceType.TEXTURE);
         this.filename = filename;
-        this.data = data;
 
         if (data == null || data.length == 0) {
             throw new IllegalArgumentException("Texture data can't be empty");
         }
 
         try {
-            this.md5sum = MessageDigest.getInstance("MD5").digest(this.data);
+            this.md5sum = MessageDigest.getInstance("MD5").digest(getData());
         } catch (NoSuchAlgorithmException e) {
             throw new IllegalArgumentException(e);
         }
@@ -77,7 +75,7 @@ public class Texture implements Comparable<Texture> {
         if (Arrays.compare(containerMagic, 0, MAGIC_TEX.length, MAGIC_TEX, 0, MAGIC_TEX.length) == 0) {
             ByteBuffer buffer = ByteBuffer.wrap(data).order(ByteOrder.LITTLE_ENDIAN);
 
-            int textureVersion = buffer.getInt(3);
+            int textureVersion = buffer.get(3);
             int ddsOffset;
             if (textureVersion == 1) {
                 //version 1
@@ -90,7 +88,7 @@ public class Texture implements Comparable<Texture> {
                 type = TextureType.TEXV2;
                 ddsOffset = 13;
             } else {
-                throw new IllegalStateException("invalid tex version");
+                throw new IllegalStateException("invalid tex version:" + textureVersion + "; file:" + filename);
             }
             height = buffer.getInt(ddsOffset + 12);
             width = buffer.getInt(ddsOffset + 16);
@@ -135,7 +133,7 @@ public class Texture implements Comparable<Texture> {
                 height = buffer.getInt(ihdrOffset + 4);
                 int depth = ihdr[8];
 
-                logger.log(System.Logger.Level.INFO, "PNG bitdepth:{0}; chunkType:{1}; ihdrSize:{2}; width:{3}; height:{4};",
+                logger.log(DEBUG, "PNG bitdepth:{0}; chunkType:{1}; ihdrSize:{2}; width:{3}; height:{4};",
                         depth, new String(chunkType), ihdrSize, width, height);
                 if (depth == 1 || depth == 2 || depth == 4 || depth == 8 || depth == 16) {
                     textureSize = data.length;
@@ -175,28 +173,8 @@ public class Texture implements Comparable<Texture> {
         }
     }
 
-    public Texture(Path filename) throws IOException {
-        this(filename, Files.readAllBytes(filename));
-    }
-
-    public Texture(String filename, byte[] data) {
-        this(Path.of(filename), data);
-    }
-
-    public Texture(String filename) throws IOException {
-        this(Path.of(filename));
-    }
-
-    public Path getFilename() {
-        return filename;
-    }
-
-    public TextureType getType() {
+    public TextureType getTextureType() {
         return type;
-    }
-
-    public byte[] getData() {
-        return data;
     }
 
     public int getWidth() {
@@ -219,7 +197,7 @@ public class Texture implements Comparable<Texture> {
                 }
                 case PNG -> {
                     return new Texture(filename,
-                            DxTexWrapper.convertPNGtoDDS(data, DxTexWrapper.Compat.DX9, DxTexWrapper.ColorSpace.BGRA));
+                            DxTexWrapper.convertPNGtoDDS(getData(), DxTexWrapper.Compat.DX9, DxTexWrapper.ColorSpace.BGRA));
                 }
                 default -> throw new NotImplementedException(String.format(ERROR_MESSAGE, type, to));
             }
@@ -230,7 +208,7 @@ public class Texture implements Comparable<Texture> {
                 }
                 case PNG -> {
                     //TEXv1 doesn't have DX10 extension header
-                    return new Texture(filename, DxTexWrapper.convertPNGtoDDS(data,
+                    return new Texture(filename, DxTexWrapper.convertPNGtoDDS(getData(),
                             DxTexWrapper.Compat.DX9, DxTexWrapper.ColorSpace.BGRA)).convert(TextureType.TEXV1);
                 }
                 default -> throw new NotImplementedException(String.format(ERROR_MESSAGE, type, to));
@@ -242,7 +220,7 @@ public class Texture implements Comparable<Texture> {
                 }
                 case PNG -> {
                     //TEXv2 doesn't have DX10 extension header
-                    return new Texture(filename, DxTexWrapper.convertPNGtoDDS(data,
+                    return new Texture(filename, DxTexWrapper.convertPNGtoDDS(getData(),
                             DxTexWrapper.Compat.DX9, DxTexWrapper.ColorSpace.BGRA)).convert(TextureType.TEXV2);
                 }
                 default -> throw new NotImplementedException(String.format(ERROR_MESSAGE, type, to));
@@ -253,7 +231,7 @@ public class Texture implements Comparable<Texture> {
                     return new Texture(filename, convertTexHeaderToDds()).convert(TextureType.PNG);
                 }
                 case DDS -> {
-                    return new Texture(filename, DxTexWrapper.convertDDStoPNG(data));
+                    return new Texture(filename, DxTexWrapper.convertDDStoPNG(getData()));
                 }
                 default -> throw new NotImplementedException(String.format(ERROR_MESSAGE, type, to));
             }
@@ -269,7 +247,7 @@ public class Texture implements Comparable<Texture> {
 
         int ddsOffset;
         byte byteVersion;
-        int ddsTextureSize = data.length;
+        int ddsTextureSize = getData().length;
         if (version.equals(TextureType.TEXV1)) {
             ddsOffset = 12;
             byteVersion = 0x01;
@@ -291,11 +269,11 @@ public class Texture implements Comparable<Texture> {
         preamble.putInt(ddsTextureSize);
         preamble.position(0);
 
-        ByteBuffer tex = ByteBuffer.allocate(preamble.limit() + data.length).order(ByteOrder.LITTLE_ENDIAN)
-                .put(preamble).put(data).position(preamble.limit());
+        ByteBuffer tex = ByteBuffer.allocate(preamble.limit() + getData().length).order(ByteOrder.LITTLE_ENDIAN)
+                .put(preamble).put(getData()).position(preamble.limit());
         tex.put(MAGIC_DDSR);
 
-        logger.log(System.Logger.Level.INFO, "filename:{0}; size:{1}; texVersion:{2}; ddsOffset:{3};",
+        logger.log(DEBUG, "filename:{0}; size:{1}; texVersion:{2}; ddsOffset:{3};",
                 filename, tex.capacity(), type, ddsOffset);
 
         int ddsHeaderStructSize = tex.getInt();
@@ -306,7 +284,7 @@ public class Texture implements Comparable<Texture> {
         int ddsHeaderDepth = tex.getInt();
         int ddsHeaderMipMapCount = tex.getInt();
         tex.position(tex.position() + (4 * 11));
-        logger.log(System.Logger.Level.INFO, "filename:''{0}''; ddsHeaderStructSize:{1}; ddsHeaderFlags:{2};" +
+        logger.log(System.Logger.Level.DEBUG, "filename:''{0}''; ddsHeaderStructSize:{1}; ddsHeaderFlags:{2};" +
                         " ddsHeaderHeight:{3}; ddsHeaderWidth:{4}; ddsHeaderPitchOrLinearSize:{5};" +
                         " ddsHeaderDepth:{6}; ddsHeaderMipMapCount:{7};",
                 filename, ddsHeaderStructSize, ddsHeaderFlags, ddsHeaderHeight, ddsHeaderWidth, ddsHeaderPitchOrLinearSize,
@@ -328,7 +306,7 @@ public class Texture implements Comparable<Texture> {
         int ddsHeaderCapsOffset = tex.position();
         int ddsHeaderCaps = tex.getInt();
 
-        logger.log(System.Logger.Level.INFO, "filename:''{0}''; pixelFormatSize:{1}; pixelFormatFlagsOffset:{2};" +
+        logger.log(System.Logger.Level.DEBUG, "filename:''{0}''; pixelFormatSize:{1}; pixelFormatFlagsOffset:{2};" +
                         " pixelFormatFlags:{3};  pixelFormatFourCC:{4};  pixelFormatRGBBitCount:{5}; pixelFormatRBitMaskOffset:{6};" +
                         " pixelFormatRBitMask:{7}; pixelFormatGBitMaskOffset:{8}; pixelFormatGBitMask:{9}; pixelFormatBBitMaskOffset:{10};" +
                         " pixelFormatBBitMask:{11}; pixelFormatABitMaskOffset:{12}; pixelFormatABitMask:{13}; ddsHeaderCapsOffset:{14};" +
@@ -365,7 +343,7 @@ public class Texture implements Comparable<Texture> {
             throw new IllegalArgumentException("texture doesn't need conversion");
         }
 
-        ByteBuffer tex = ByteBuffer.wrap(data).order(ByteOrder.LITTLE_ENDIAN);
+        ByteBuffer tex = ByteBuffer.wrap(getData()).order(ByteOrder.LITTLE_ENDIAN);
         tex.position(0);
 
         int ddsOffset;
@@ -381,7 +359,7 @@ public class Texture implements Comparable<Texture> {
             throw new IllegalStateException("invalid texture size");
         }
 
-        logger.log(System.Logger.Level.INFO, "filename:{0}; size:{1}; texVersion:{2}; ddsOffset:{3};",
+        logger.log(DEBUG, "filename:{0}; size:{1}; texVersion:{2}; ddsOffset:{3};",
                 filename, tex.capacity(), type, ddsOffset);
 
         // remove 'R' from DDSR magic
@@ -415,7 +393,7 @@ public class Texture implements Comparable<Texture> {
         int ddsHeaderDepth = tex.getInt();
         int ddsHeaderMipMapCount = tex.getInt();
         tex.position(tex.position() + (4 * 11));
-        logger.log(System.Logger.Level.INFO, "filename:''{0}''; ddsHeaderStructSize:{1}; ddsHeaderFlags:{2};" +
+        logger.log(DEBUG, "filename:''{0}''; ddsHeaderStructSize:{1}; ddsHeaderFlags:{2};" +
                         " ddsHeaderHeight:{3}; ddsHeaderWidth:{4}; ddsHeaderPitchOrLinearSize:{5};" +
                         " ddsHeaderDepth:{6}; ddsHeaderMipMapCount:{7};",
                 filename, ddsHeaderStructSize, ddsHeaderFlags, ddsHeaderHeight, ddsHeaderWidth, ddsHeaderPitchOrLinearSize,
@@ -450,7 +428,7 @@ public class Texture implements Comparable<Texture> {
         int ddsHeaderCapsOffset = tex.position();
         int ddsHeaderCaps = tex.getInt();
 
-        logger.log(System.Logger.Level.INFO, "filename:''{0}''; pixelFormatSize:{1}; pixelFormatFlagsOffset:{2};" +
+        logger.log(DEBUG, "filename:''{0}''; pixelFormatSize:{1}; pixelFormatFlagsOffset:{2};" +
                         " pixelFormatFlags:{3};  pixelFormatFourCC:{4};  pixelFormatRGBBitCount:{5}; pixelFormatRBitMaskOffset:{6};" +
                         " pixelFormatRBitMask:{7}; pixelFormatGBitMaskOffset:{8}; pixelFormatGBitMask:{9}; pixelFormatBBitMaskOffset:{10};" +
                         " pixelFormatBBitMask:{11}; pixelFormatABitMaskOffset:{12}; pixelFormatABitMask:{13}; ddsHeaderCapsOffset:{14};" +

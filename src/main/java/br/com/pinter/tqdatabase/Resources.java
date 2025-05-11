@@ -21,11 +21,19 @@
 package br.com.pinter.tqdatabase;
 
 import br.com.pinter.tqdatabase.data.ResourceReader;
+import br.com.pinter.tqdatabase.models.ResourceFile;
+import br.com.pinter.tqdatabase.models.ResourceType;
+import br.com.pinter.tqdatabase.models.Texture;
+import br.com.pinter.tqdatabase.models.TextureType;
 import org.apache.commons.lang3.NotImplementedException;
 
 import java.io.IOException;
+import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Class to access resources from game
@@ -33,34 +41,81 @@ import java.util.Map;
 @SuppressWarnings({"UnusedReturnValue", "unused"})
 public class Resources implements TQService {
     private static final System.Logger logger = System.getLogger(Resources.class.getName());
-    private final String path;
+    private final Path path;
+    private final ResourceReader reader;
 
     /**
-     * @param path Resources directory path
+     * @param path Path of an ARC file
      */
-    public Resources(String path) {
+    public Resources(Path path) throws IOException {
         this.path = path;
+        this.reader = ResourceReader.builder(path.toAbsolutePath()).withCache(false).build();
     }
 
     /**
-     * Method to preload resources
+     * @param path Path of an ARC file
      */
+    public Resources(String path) throws IOException {
+        this(Path.of(path));
+    }
+
+    @Override
     public void preload() throws IOException {
         throw new NotImplementedException("not implemented");
     }
 
-    public Map<String, byte[]> getAllFonts() {
-        Map<String, byte[]> fonts = new HashMap<>();
+    public Path getPath() {
+        return path;
+    }
 
-        try {
-            ResourceReader resource = ResourceReader.builder(path).withCache(false).build();
-            for (String resourceName : resource.list()) {
-                fonts.put(resourceName, resource.getData(resourceName));
+    public List<String> getNames() {
+        return new ArrayList<>(reader.list());
+    }
+
+    public ResourceFile getFile(String resourceName) throws IOException {
+        if (reader.list().contains(resourceName)) {
+            ResourceType rt = ResourceType.of(resourceName);
+            if (rt == ResourceType.TEXTURE) {
+                return new Texture(resourceName, reader.getData(resourceName));
+            } else {
+                return new ResourceFile(resourceName, reader.getData(resourceName), rt);
             }
-        } catch (IOException e) {
-            logger.log(System.Logger.Level.ERROR, "Error", e);
         }
 
-        return fonts;
+        return null;
+    }
+
+    public byte[] getTextureAsDds(String name) throws IOException {
+        return reader.readTexture(name).convert(TextureType.DDS).getData();
+    }
+
+    public Map<String, ResourceFile> getAll() throws IOException {
+        return getAllFromArchive(null);
+    }
+
+    public Map<String, byte[]> getAllFonts() throws IOException {
+        return getAllFromArchive(ResourceType.FONT).entrySet()
+                .stream().collect(Collectors.toMap(
+                        Map.Entry::getKey, e -> e.getValue().getData())
+                );
+    }
+
+    public Map<String, ResourceFile> getAllFromArchive(ResourceType type) throws IOException {
+        Map<String, ResourceFile> ret = new HashMap<>();
+
+        try {
+            for (String resourceName : type == null ? reader.list() : reader.list(type)) {
+                ResourceType rt = ResourceType.of(resourceName);
+                if (rt == ResourceType.TEXTURE) {
+                    ret.put(resourceName, new Texture(resourceName, reader.getData(resourceName)));
+                } else {
+                    ret.put(resourceName, new ResourceFile(resourceName, reader.getData(resourceName), rt));
+                }
+            }
+        } catch (EntryNotFoundException e) {
+            throw new IOException(e);
+        }
+
+        return ret;
     }
 }

@@ -25,6 +25,7 @@ import br.com.pinter.tqdatabase.data.ResourceReader;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -118,7 +119,7 @@ public class Text implements TQService {
         }
     }
 
-    private String resolveArcFilename(String path) {
+    private Path resolveArcFilename(String path) {
         String filename = null;
         if (lang != null && lang.matches("[A-Z]{2}")) {
             filename = String.format("%s/Text_%s.arc", path, lang);
@@ -127,10 +128,10 @@ public class Text implements TQService {
         if((filename == null || filename.isEmpty()) || !new File(filename).exists()) {
             filename = String.format("%s/Text_EN.arc", path);
         }
-        return filename;
+        return Path.of(filename);
     }
 
-    private void loadText(String filename) throws IOException {
+    private void loadText(Path filename) throws IOException {
         ResourceReader resource = ResourceReader.builder(filename).withCache(useCache).build();
         this.tags.putAll(resource.readText());
     }
