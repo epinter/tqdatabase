@@ -21,6 +21,8 @@
 package br.com.pinter.tqdatabase;
 
 import br.com.pinter.tqdatabase.data.ResourceReader;
+import br.com.pinter.tqdatabase.data.TextureConverter;
+import br.com.pinter.tqdatabase.models.DbRecord;
 import br.com.pinter.tqdatabase.models.ResourceFile;
 import br.com.pinter.tqdatabase.models.ResourceType;
 import br.com.pinter.tqdatabase.models.Texture;
@@ -73,7 +75,7 @@ public class Resources implements TQService {
     }
 
     public ResourceFile getFile(String resourceName) throws IOException {
-        if (reader.list().contains(resourceName)) {
+        if (reader.list().contains(DbRecord.normalizeRecordPath(resourceName))) {
             ResourceType rt = ResourceType.of(resourceName);
             if (rt == ResourceType.TEXTURE) {
                 return new Texture(resourceName, reader.getData(resourceName));
@@ -86,7 +88,7 @@ public class Resources implements TQService {
     }
 
     public byte[] getTextureAsDds(String name) throws IOException {
-        return reader.readTexture(name).convert(TextureType.DDS).getData();
+        return new TextureConverter(reader.readTexture(name)).convert(TextureType.DDS, false).getData();
     }
 
     public Map<String, ResourceFile> getAll() throws IOException {
