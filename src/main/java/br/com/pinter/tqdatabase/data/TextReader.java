@@ -64,6 +64,7 @@ class TextReader implements ArcEntryReader<Map<String, String>> {
 
         return ret;
     }
+
     @Override
     public Map<String, String> readAll(ResourceReader resourceReader) throws IOException {
         Map<String, String> ret = new HashMap<>();

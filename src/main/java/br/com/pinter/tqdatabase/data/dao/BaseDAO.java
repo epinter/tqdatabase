@@ -44,7 +44,7 @@ interface BaseDAO {
     }
 
     default BaseType getSpawnObject(DbRecord rs) {
-        if(rs == null) {
+        if (rs == null) {
             return null;
         }
         String className = (String) rs.getFirstValue(Database.Variables.CLASS);
@@ -100,7 +100,7 @@ interface BaseDAO {
     }
 
     default DbVariable getVariableFromVarTableIndex(Map<String, DbVariable> table, int index) {
-        for (Map.Entry<String, DbVariable> k: table.entrySet()) {
+        for (Map.Entry<String, DbVariable> k : table.entrySet()) {
             String strIdx = k.getKey().replaceAll("[a-zA-Z]+(\\d+)$", "$1");
             int idx;
             try {

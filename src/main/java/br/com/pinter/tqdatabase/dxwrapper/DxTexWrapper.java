@@ -28,6 +28,7 @@ import java.nio.ByteBuffer;
 
 public class DxTexWrapper {
     private static native Data.ByValue convertDDStoPNG(long size, Buffer data);
+
     private static native Data.ByValue convertPNGtoDDS(long size, Buffer data, boolean dx10ext, boolean bgra);
 
     public enum Compat {

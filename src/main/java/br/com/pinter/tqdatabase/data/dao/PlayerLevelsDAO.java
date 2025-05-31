@@ -49,12 +49,12 @@ public class PlayerLevelsDAO implements BaseDAO {
     }
 
     public PlayerLevels getPlayerLevels() {
-        if(playerLevels != null) {
+        if (playerLevels != null) {
             return playerLevels;
         }
 
         DbRecord r = getPlayerLevelRecord();
-        if(r == null) {
+        if (r == null) {
             throw new IllegalStateException("playerlevels record not found in database");
         }
         Map<String, DbVariable> variables = r.getVariables();
@@ -70,7 +70,7 @@ public class PlayerLevelsDAO implements BaseDAO {
         p.setCharacterModifierPoints((Integer) variables.get("characterModifierPoints").getFirstValue());
         p.setExperienceLevelEquation((String) variables.get("experienceLevelEquation").getFirstValue());
 
-        if(p.getIntelligenceIncrement() <= 0
+        if (p.getIntelligenceIncrement() <= 0
                 || p.getStrengthIncrement() <= 0
                 || p.getDexterityIncrement() <= 0
                 || p.getManaIncrement() <= 0

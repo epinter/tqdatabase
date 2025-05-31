@@ -24,5 +24,6 @@ import java.io.IOException;
 
 interface ArcEntryReader<T> {
     T readAll(ResourceReader resourceReader) throws IOException;
+
     T readFile(ResourceReader resourceReader, String filename) throws IOException;
 }
