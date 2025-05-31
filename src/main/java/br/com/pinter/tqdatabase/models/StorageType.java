@@ -35,6 +35,6 @@ public enum StorageType {
 
     public static StorageType valueOf(int storageType) throws IOException {
         return Arrays.stream(StorageType.values()).filter(v -> v.value == storageType)
-                .findFirst().orElseThrow(() -> new IOException("StorageType not implemented: "+storageType));
+                .findFirst().orElseThrow(() -> new IOException("StorageType not implemented: " + storageType));
     }
 }

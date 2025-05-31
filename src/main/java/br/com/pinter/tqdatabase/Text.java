@@ -48,7 +48,7 @@ public class Text implements TQService {
     /**
      * Constructor for english (EN) text resources.
      *
-      * @param paths Array of ordered absolute paths for the Text directories containing all Text_* files.
+     * @param paths Array of ordered absolute paths for the Text directories containing all Text_* files.
      *              Strings from files loaded last will override those loaded first.
      */
     public Text(String[] paths) {
@@ -61,16 +61,16 @@ public class Text implements TQService {
      *
      * @param paths Array of ordered absolute paths for the Text directories containing all Text_* files.
      *              Strings from files loaded last will override those loaded first.
-     * @param lang The language to load text resources
+     * @param lang  The language to load text resources
      */
     public Text(String[] paths, String lang) {
         this(paths, lang, true);
     }
 
     /**
-     * @param paths Array of ordered absolute paths for the Text directories containing all Text_* files.
-     *              Strings from files loaded last will override those loaded first.
-     * @param lang The language to load text resources
+     * @param paths    Array of ordered absolute paths for the Text directories containing all Text_* files.
+     *                 Strings from files loaded last will override those loaded first.
+     * @param lang     The language to load text resources
      * @param useCache Disable cache
      */
     public Text(String[] paths, String lang, boolean useCache) {
@@ -114,7 +114,7 @@ public class Text implements TQService {
     }
 
     private void loadTextFromAllPaths() throws IOException {
-        for (String p: pathList) {
+        for (String p : pathList) {
             loadText(resolveArcFilename(p));
         }
     }
@@ -125,7 +125,7 @@ public class Text implements TQService {
             filename = String.format("%s/Text_%s.arc", path, lang);
         }
 
-        if((filename == null || filename.isEmpty()) || !new File(filename).exists()) {
+        if ((filename == null || filename.isEmpty()) || !new File(filename).exists()) {
             filename = String.format("%s/Text_EN.arc", path);
         }
         return Path.of(filename);

@@ -74,9 +74,9 @@ public class Skills implements TQService {
      * Get the skill located at <b><code>recordPath</code></b>
      *
      * @param recordPath Path of the skill record
-     * @param resolve If <b>true</b>, buff skills and pets will be resolved (followed). The target record specified in
-     *                the buff or pet variable in the <b><code>recordPath</code></b> will be used to find and return the final record.
-     *                If <b>false</b>, the skill record specified by <b><code>recordPath</code></b> will be returned.
+     * @param resolve    If <b>true</b>, buff skills and pets will be resolved (followed). The target record specified in
+     *                   the buff or pet variable in the <b><code>recordPath</code></b> will be used to find and return the final record.
+     *                   If <b>false</b>, the skill record specified by <b><code>recordPath</code></b> will be returned.
      * @return The {@link Skill} object representing <b><code>recordPath</code></b>
      */
     public Skill getSkill(String recordPath, boolean resolve) {

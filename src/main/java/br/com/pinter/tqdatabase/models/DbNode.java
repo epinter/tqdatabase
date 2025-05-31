@@ -75,6 +75,7 @@ public class DbNode {
     public boolean isRecordLoaded() {
         return this.record != null;
     }
+
     @Override
     public String toString() {
         return name.toString();

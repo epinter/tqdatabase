@@ -51,7 +51,7 @@ public enum ResourceType {
     public static ResourceType of(String name) {
         Optional<ResourceType> type = Arrays.stream(ResourceType.values()).filter(t ->
                 t.getExtensions().stream().anyMatch(e ->
-                        name.toUpperCase(Locale.ROOT).endsWith("."+e)
+                        name.toUpperCase(Locale.ROOT).endsWith("." + e)
                 )).findFirst();
         return type.orElse(null);
 

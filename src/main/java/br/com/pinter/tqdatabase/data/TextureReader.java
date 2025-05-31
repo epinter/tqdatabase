@@ -34,7 +34,7 @@ public class TextureReader implements ArcEntryReader<Texture> {
 
     @Override
     public Texture readFile(ResourceReader resourceReader, String filename) throws IOException {
-        if(SystemUtils.IS_OS_WINDOWS) {
+        if (SystemUtils.IS_OS_WINDOWS) {
             return new Texture(filename, resourceReader.getData(filename));
         } else {
             throw new NotImplementedException("Only Windows OS is supported");

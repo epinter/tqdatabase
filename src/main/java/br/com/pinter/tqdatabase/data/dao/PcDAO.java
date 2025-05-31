@@ -60,7 +60,7 @@ public class PcDAO implements BaseDAO {
         Pc p = new Pc();
         String recordGender = Constants.RECORD_PC_MALE;
 
-        if(gender.equals(Pc.Gender.FEMALE)) {
+        if (gender.equals(Pc.Gender.FEMALE)) {
             recordGender = Constants.RECORD_PC_FEMALE;
         }
 

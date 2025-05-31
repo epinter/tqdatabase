@@ -29,7 +29,7 @@ public class Pc {
     private Float characterStrength;
     private Float characterIntelligence;
     private Float characterDexterity;
-    private Map<String,String> skillTreeTable;
+    private Map<String, String> skillTreeTable;
     private Gender gender = Gender.MALE;
     private List<String> playerTextures;
 
