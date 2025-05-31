@@ -16,7 +16,7 @@ buildscript {
 }
 
 group = 'br.com.pinter.tqdatabase'
-version = '0.2'
+version = '0.5'
 
 java {
     sourceCompatibility = JavaVersion.VERSION_21
