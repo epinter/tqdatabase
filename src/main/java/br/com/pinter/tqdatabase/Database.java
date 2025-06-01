@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.regex.Matcher;
 
 /**
  * This class is designed to concentrate all access to data contained in the game database by using methods to
@@ -128,10 +129,7 @@ public class Database {
                 continue;
             }
             for (var e : databaseReader.getRecordsForDb(s)) {
-                Path path = Path.of(e.getId());
-                if (!File.separator.equals("\\")) {
-                    path = Path.of(e.getId().replaceAll("\\\\", "/"));
-                }
+                Path path = Path.of(e.getId().replace("\\", Matcher.quoteReplacement(File.separator)));
                 for (int i = 0; i < path.getNameCount(); i++) {
                     Path nodeName;
                     DbNode n;
