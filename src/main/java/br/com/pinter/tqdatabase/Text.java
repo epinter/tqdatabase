@@ -128,11 +128,17 @@ public class Text implements TQService {
         if ((filename == null || filename.isEmpty()) || !new File(filename).exists()) {
             filename = String.format("%s/Text_EN.arc", path);
         }
+
+        if (!new File(filename).exists()) {
+            filename = String.format("%s/Text.arc", path);
+        }
+
         return Path.of(filename);
     }
 
     private void loadText(Path filename) throws IOException {
         ResourceReader resource = ResourceReader.builder(filename).withCache(useCache).build();
+        logger.log(INFO, "Loading text from ''{0}''", filename);
         this.tags.putAll(resource.readText());
     }
 
