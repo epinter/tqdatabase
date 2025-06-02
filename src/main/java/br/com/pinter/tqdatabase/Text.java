@@ -23,14 +23,16 @@ package br.com.pinter.tqdatabase;
 import br.com.pinter.tqdatabase.cache.CacheText;
 import br.com.pinter.tqdatabase.data.ResourceReader;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
+import static java.lang.System.Logger.Level.ERROR;
 import static java.lang.System.Logger.Level.INFO;
 
 /**
@@ -120,20 +122,32 @@ public class Text implements TQService {
     }
 
     private Path resolveArcFilename(String path) {
-        String filename = null;
-        if (lang != null && lang.matches("[A-Z]{2}")) {
-            filename = String.format("%s/Text_%s.arc", path, lang);
+        Path textLang = null;
+        Path textEn = null;
+        Path textArc = null;
+        try (Stream<Path> files = Files.list(Path.of(path))) {
+            for (Path arc : files.toList()) {
+                if (arc.getFileName().toString().equalsIgnoreCase(String.format("text_%s.arc", lang))) {
+                    textLang = arc;
+                }
+                if (arc.getFileName().toString().equalsIgnoreCase("text_en.arc")) {
+                    textEn = arc;
+                }
+                if (arc.getFileName().toString().equalsIgnoreCase("text.arc")) {
+                    textArc = arc;
+                }
+            }
+        } catch (IOException e) {
+            logger.log(ERROR, "Error", e);
         }
 
-        if ((filename == null || filename.isEmpty()) || !new File(filename).exists()) {
-            filename = String.format("%s/Text_EN.arc", path);
+        if (textLang != null) {
+            return textLang;
+        } else if (textEn != null) {
+            return textEn;
+        } else {
+            return textArc;
         }
-
-        if (!new File(filename).exists()) {
-            filename = String.format("%s/Text.arc", path);
-        }
-
-        return Path.of(filename);
     }
 
     private void loadText(Path filename) throws IOException {
