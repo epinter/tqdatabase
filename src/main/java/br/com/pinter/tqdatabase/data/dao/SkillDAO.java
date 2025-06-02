@@ -52,6 +52,7 @@ public class SkillDAO implements BaseDAO {
 
     @Override
     public void preload() {
+        skillList = null;
         getSkillList();
     }
 

@@ -45,6 +45,7 @@ public class PcDAO implements BaseDAO {
 
     @Override
     public void preload() {
+        pc = null;
         pc = getPc();
     }
 

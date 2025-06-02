@@ -45,6 +45,7 @@ public class PlayerLevelsDAO implements BaseDAO {
 
     @Override
     public void preload() {
+        playerLevels = null;
         playerLevels = getPlayerLevels();
     }
 
