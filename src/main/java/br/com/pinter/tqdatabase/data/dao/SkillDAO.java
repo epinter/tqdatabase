@@ -29,6 +29,8 @@ import br.com.pinter.tqdatabase.models.Skill;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -187,7 +189,7 @@ public class SkillDAO implements BaseDAO {
                     mastery.setDbRecord(rs);
                     masterySkillList.add(mastery);
                     currentMastery = mastery;
-                } else if (rs.getId().matches(Constants.REGEXP_PATH_SKILL)) {
+                } else {
                     Skill skill = getSkillFromRecord(rs);
                     masterySkillList.add(skill);
                     while (skill.isPointsToBuff() || skill.isPointsToPet()) {
@@ -308,7 +310,7 @@ public class SkillDAO implements BaseDAO {
         for (DbVariable v : varList) {
             if (v.getType() == DbVariable.Type.STRING) {
                 String p = (String) v.getFirstValue();
-                if (p != null && !p.isEmpty() && !skills.containsKey(p) && p.matches(Constants.REGEXP_PATH_SKILLTREE)) {
+                if (p != null && !p.isEmpty() && !skills.containsKey(p)) {
                     String recordPath = DbRecord.normalizeRecordPath(p);
                     DbRecord record = getRecord(recordPath);
                     if (record != null) {
