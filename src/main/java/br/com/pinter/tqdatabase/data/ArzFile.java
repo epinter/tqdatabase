@@ -258,11 +258,10 @@ class ArzFile {
     //decompress a raw deflate(rfc1951) stream (a single record)
     private byte[] recordDecompress(String id) {
         DbRecord r = recordsMetadata.get(id);
-        arzBuffer.position(r.getOffset() + 2);
         logger.log(System.Logger.Level.TRACE, "reading (''{0}'') from offset ''{1}'' type ''{2}'' (pos ''{3}'')\n", id, String.format("%X", r.getOffset()), r.getRecordType(), String.format("%X", arzBuffer.position()));
 
         ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-        ByteArrayInputStream input = new ByteArrayInputStream(arzBuffer.array(), arzBuffer.position(), arzBuffer.limit());
+        ByteArrayInputStream input = new ByteArrayInputStream(arzBuffer.array(), r.getOffset() + 2, arzBuffer.limit());
 
         try {
             InflaterInputStream inflaterInputStream = new InflaterInputStream(input, new Inflater(true), 512);
