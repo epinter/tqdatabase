@@ -44,6 +44,9 @@ public class TeleportDAO implements BaseDAO {
 
     public Teleport getTeleport(String recordId) {
         DbRecord tpRecord = getRecord(recordId);
+        if (tpRecord == null) {
+            return null;
+        }
         String description = (String) tpRecord.getFirstValue("description");
         String className = (String) tpRecord.getFirstValue("Class");
         if (description != null) {
